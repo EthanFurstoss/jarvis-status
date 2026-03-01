@@ -3,190 +3,425 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Jarvis Status</title>
+  <title>Jarvis — Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #080809;
+      --surface: #111113;
+      --surface2: #18181c;
+      --border: #1e1e24;
+      --border2: #28282f;
+      --accent: #4f8ef7;
+      --accent-dim: #1a2d52;
+      --green: #34d399;
+      --green-dim: #0d2e22;
+      --amber: #f59e0b;
+      --amber-dim: #2a1f00;
+      --red: #f87171;
+      --red-dim: #2a1010;
+      --text: #f0f0f2;
+      --text2: #8b8b99;
+      --text3: #4a4a58;
+      --radius: 12px;
+      --font: 'Inter', -apple-system, sans-serif;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0f0f0f; color: #e8e8e8; font-family: -apple-system, sans-serif; padding: 24px; max-width: 680px; margin: 0 auto; }
-    h1 { font-size: 1.4rem; color: #4f8ef7; margin-bottom: 4px; }
-    .subtitle { color: #555; font-size: 0.8rem; margin-bottom: 28px; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
 
-    .task { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden; }
-    .task.blocked { border-color: #f5a623; box-shadow: 0 0 0 1px #f5a62344; }
-    .task.blocked::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #f5a623; }
-    .task.running::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #4f8ef7; }
-    .task.done::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #4caf50; }
+    /* Grid layout */
+    .shell {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      gap: 24px;
+    }
 
-    .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
-    .task-name { font-weight: 600; font-size: 0.95rem; }
-    .task-name a { color: #e8e8e8; text-decoration: none; }
-    .task-name a:hover { color: #4f8ef7; }
+    /* Header */
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px #4f8ef7aa;
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+    .brand-name { font-size: 1rem; font-weight: 600; letter-spacing: -0.3px; }
+    .brand-sub { font-size: 0.75rem; color: var(--text3); margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 0.72rem; color: var(--text2);
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+    #clock { font-size: 0.72rem; color: var(--text3); font-variant-numeric: tabular-nums; }
 
-    .badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; white-space: nowrap; letter-spacing: 0.5px; }
-    .badge.running { background: #1a3a6b; color: #4f8ef7; animation: pulse 1.5s infinite; }
-    .badge.done { background: #1a3a1a; color: #4caf50; }
-    .badge.pending { background: #2a2a2a; color: #888; }
-    .badge.paused { background: #2a2a1a; color: #aaa855; }
-    .badge.blocked { background: #3a2a00; color: #f5a623; animation: pulse 1.5s infinite; }
+    /* Main tasks column */
+    .tasks-col { display: flex; flex-direction: column; gap: 12px; }
 
-    .blocked-banner { background: #2a1f00; border: 1px solid #f5a62366; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
-    .blocked-banner .text { font-size: 0.82rem; color: #f5a623; line-height: 1.5; }
-    .blocked-banner .text strong { display: block; margin-bottom: 2px; }
-    .action-btn { display: inline-block; margin-top: 6px; background: #f5a623; color: #000; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 6px; text-decoration: none; }
+    /* Section label */
+    .section-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 4px;
+    }
 
-    .progress-wrap { margin-bottom: 8px; }
-    .progress-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-bottom: 5px; }
-    .progress-meta .pct { font-weight: 700; color: #aaa; transition: all 0.5s; }
-    .progress-bar { background: #2a2a2a; border-radius: 4px; height: 7px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 4px; transition: width 1s linear; }
-    .progress-fill.running { background: linear-gradient(90deg, #4f8ef7 0%, #7ab3ff 50%, #4f8ef7 100%); background-size: 200% 100%; animation: shimmer 2s linear infinite; }
-    .progress-fill.done { background: #4caf50; }
-    .progress-fill.pending { background: #3a3a3a; }
-    .progress-fill.paused { background: #6a6a30; }
-    .progress-fill.blocked { background: #f5a623; animation: shimmer 2s linear infinite; }
+    /* Task card */
+    .task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .task:hover { border-color: var(--border2); }
+    .task-stripe {
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .stripe-running { background: linear-gradient(90deg, var(--accent), #7ab3ff); }
+    .stripe-done { background: var(--green); }
+    .stripe-blocked { background: var(--amber); }
+    .stripe-pending { background: var(--border2); }
+    .stripe-paused { background: #6a6a30; }
 
-    .task-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.75rem; color: #555; margin-top: 8px; }
-    .task-meta .eta { color: #4f8ef7; }
-    .task-desc { color: #777; font-size: 0.8rem; margin-top: 6px; line-height: 1.5; }
-    .updated { color: #333; font-size: 0.72rem; text-align: right; margin-top: 20px; }
+    .task-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .task-name { font-size: 0.9rem; font-weight: 600; letter-spacing: -0.2px; display: flex; align-items: center; gap: 8px; }
+    .task-name a { color: var(--text); text-decoration: none; }
+    .task-name a:hover { color: var(--accent); }
 
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .badge {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; padding: 3px 9px; border-radius: 6px;
+      white-space: nowrap;
+    }
+    .badge-running { background: var(--accent-dim); color: var(--accent); animation: pulse 2s infinite; }
+    .badge-done { background: var(--green-dim); color: var(--green); }
+    .badge-blocked { background: var(--amber-dim); color: var(--amber); animation: pulse 2s infinite; }
+    .badge-pending { background: var(--surface2); color: var(--text3); }
+    .badge-paused { background: #1f1f10; color: #888840; }
+
+    /* Progress */
+    .progress-area { margin-bottom: 12px; }
+    .progress-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .progress-label { font-size: 0.72rem; color: var(--text3); }
+    .progress-pct { font-size: 0.78rem; font-weight: 600; color: var(--text2); font-variant-numeric: tabular-nums; }
+    .progress-track { background: var(--surface2); border-radius: 3px; height: 4px; overflow: hidden; }
+    .progress-fill {
+      height: 100%; border-radius: 3px;
+      transition: width 1s linear;
+    }
+    .fill-running {
+      background: linear-gradient(90deg, var(--accent) 0%, #7ab3ff 50%, var(--accent) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 2s linear infinite;
+    }
+    .fill-done { background: var(--green); }
+    .fill-blocked { background: var(--amber); background-size: 200% 100%; animation: shimmer 2s linear infinite; }
+    .fill-pending { background: var(--border2); }
+    .fill-paused { background: #6a6a30; }
+
+    /* Meta row */
+    .task-meta { display: flex; gap: 14px; flex-wrap: wrap; }
+    .meta-item { font-size: 0.7rem; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+    .meta-item.accent { color: var(--accent); }
+    .meta-item.green { color: var(--green); }
+
+    /* Blocked banner */
+    .block-banner {
+      background: var(--amber-dim);
+      border: 1px solid #f59e0b33;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .block-text { font-size: 0.78rem; color: var(--amber); line-height: 1.6; }
+    .block-text strong { display: block; margin-bottom: 2px; font-size: 0.8rem; }
+    .block-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 8px; background: var(--amber); color: #000;
+      font-size: 0.72rem; font-weight: 700; padding: 5px 12px;
+      border-radius: 6px; text-decoration: none; cursor: pointer; border: none;
+      transition: opacity 0.2s;
+    }
+    .block-btn:hover { opacity: 0.85; }
+    .cmd-box {
+      background: var(--bg); border-radius: 8px; padding: 12px 14px;
+      margin-bottom: 14px; display: none;
+    }
+    .cmd-step { font-size: 0.7rem; color: var(--text3); margin-bottom: 4px; }
+    .cmd-code { font-family: 'SF Mono', monospace; font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
+
+    /* Sidebar */
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Quick links */
+    .widget {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .widget-title { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+    .link-btn {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 9px 12px; margin-bottom: 7px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 8px; color: var(--text); font-size: 0.8rem; font-weight: 500;
+      text-decoration: none; transition: all 0.15s; cursor: pointer;
+    }
+    .link-btn:last-child { margin-bottom: 0; }
+    .link-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .link-icon { font-size: 0.9rem; flex-shrink: 0; }
+
+    /* Summary widget */
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label { font-size: 0.75rem; color: var(--text2); }
+    .summary-val { font-size: 0.75rem; font-weight: 600; }
+    .val-running { color: var(--accent); }
+    .val-blocked { color: var(--amber); }
+    .val-done { color: var(--green); }
+    .val-pending { color: var(--text3); }
+
+    /* Footer */
+    .footer { grid-column: 1 / -1; text-align: center; font-size: 0.68rem; color: var(--text3); padding-top: 16px; border-top: 1px solid var(--border); }
+
+    @keyframes breathe { 0%,100%{box-shadow:0 0 8px #4f8ef7aa} 50%{box-shadow:0 0 18px #4f8ef7dd} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
     @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+
+    @media(max-width:700px) {
+      .shell { grid-template-columns: 1fr; padding: 16px; }
+      header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
   </style>
 </head>
 <body>
-  <h1>🤖 Jarvis Status</h1>
-  <div class="subtitle">Live task tracker · updates every second</div>
+<div class="shell">
 
-  <!-- BUILDING -->
-  <div class="task running">
-    <div class="task-header">
-      <div class="task-name">💻 Jarvis Dashboard PWA</div>
-      <div class="badge running">BUILDING</div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-meta">
-        <span>Next.js + Vercel KV + PWA</span>
-        <span class="pct" id="pwa-pct">0%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill running" id="pwa-bar" style="width:0%"></div></div>
-    </div>
-    <div class="task-meta">
-      <span>🕐 Started: 3:03 AM</span>
-      <span class="eta" id="pwa-eta">⏱ Calculating...</span>
-    </div>
-    <div class="task-desc">Building Next.js 14 PWA with live activity feed, Vercel KV storage, and iPhone home screen support.</div>
-  </div>
-
-  <!-- BLOCKED -->
-  <div class="task blocked">
-    <div class="task-header">
-      <div class="task-name">🔧 Tailscale Setup</div>
-      <div class="badge blocked">⚠ BLOCKED</div>
-    </div>
-    <div class="blocked-banner">
-      <div class="text">
-        <strong>🙋 Action needed from Ethan</strong>
-        Run two Terminal commands to start the Tailscale daemon.
-        <a class="action-btn" onclick="showCommands()">📋 Show Commands</a>
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div>
+        <div class="brand-name">Jarvis</div>
+        <div class="brand-sub">Personal AI Assistant</div>
       </div>
     </div>
-    <div id="commands-box" style="display:none;background:#111;border-radius:8px;padding:12px;margin-bottom:10px;font-size:0.8rem;">
-      <div style="color:#888;margin-bottom:6px">Step 1:</div>
-      <code style="color:#4f8ef7;display:block;margin-bottom:10px">sudo tailscaled &</code>
-      <div style="color:#888;margin-bottom:6px">Step 2:</div>
-      <code style="color:#4f8ef7;display:block">tailscale up</code>
+    <div class="header-right">
+      <div class="live-pill"><div class="live-dot"></div> Live</div>
+      <div id="clock"></div>
     </div>
-    <div class="progress-wrap">
-      <div class="progress-meta"><span>Installed · daemon not running</span><span class="pct">60%</span></div>
-      <div class="progress-bar"><div class="progress-fill blocked" style="width:60%"></div></div>
+  </header>
+
+  <!-- TASKS -->
+  <div class="tasks-col">
+    <div class="section-label">Active Tasks</div>
+
+    <!-- PWA BUILD -->
+    <div class="task">
+      <div class="task-stripe stripe-running"></div>
+      <div class="task-top">
+        <div class="task-name">💻 Jarvis Dashboard PWA</div>
+        <div class="badge badge-running">Building</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span class="progress-label">Next.js · Vercel KV · PWA manifest</span>
+          <span class="progress-pct" id="pwa-pct">—</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill fill-running" id="pwa-bar" style="width:0%"></div></div>
+      </div>
+      <div class="task-meta">
+        <div class="meta-item">🕐 Started 3:03 AM</div>
+        <div class="meta-item accent" id="pwa-eta">⏱ Calculating…</div>
+      </div>
     </div>
-    <div class="task-meta">
-      <span>🕐 Started: 2:50 AM</span>
-      <span class="eta">⏱ ~2 min after action</span>
+
+    <!-- TAILSCALE BLOCKED -->
+    <div class="task">
+      <div class="task-stripe stripe-blocked"></div>
+      <div class="task-top">
+        <div class="task-name">🔧 Tailscale Setup</div>
+        <div class="badge badge-blocked">⚠ Blocked</div>
+      </div>
+      <div class="block-banner">
+        <div class="block-text">
+          <strong>Action needed from Ethan</strong>
+          Run two Terminal commands to start the Tailscale daemon.
+          <button class="block-btn" onclick="toggleCmds()">📋 Show Commands</button>
+        </div>
+      </div>
+      <div class="cmd-box" id="cmd-box">
+        <div class="cmd-step">Step 1</div>
+        <code class="cmd-code">sudo tailscaled &</code>
+        <div class="cmd-step">Step 2</div>
+        <code class="cmd-code">tailscale up</code>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span class="progress-label">Installed · daemon not running</span>
+          <span class="progress-pct">60%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill fill-blocked" style="width:60%"></div></div>
+      </div>
+      <div class="task-meta">
+        <div class="meta-item">🕐 Started 2:50 AM</div>
+        <div class="meta-item accent">⏱ ~2 min after action</div>
+      </div>
     </div>
+
+    <div class="section-label" style="margin-top:8px">Queued</div>
+
+    <!-- IMESSAGE -->
+    <div class="task">
+      <div class="task-stripe stripe-pending"></div>
+      <div class="task-top">
+        <div class="task-name">🌐 iMessage Fix</div>
+        <div class="badge badge-pending">Pending</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span class="progress-label">imsg rpc error</span>
+          <span class="progress-pct">10%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill fill-pending" style="width:10%"></div></div>
+      </div>
+      <div class="task-meta">
+        <div class="meta-item">🕐 Queued</div>
+        <div class="meta-item accent">⏱ ~5 min when started</div>
+      </div>
+    </div>
+
+    <!-- AI DETECTOR -->
+    <div class="task">
+      <div class="task-stripe stripe-paused"></div>
+      <div class="task-top">
+        <div class="task-name">🤖 AI Detector Site</div>
+        <div class="badge badge-paused">Paused</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span class="progress-label">Awaiting Hive API key</span>
+          <span class="progress-pct">5%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill fill-paused" style="width:5%"></div></div>
+      </div>
+      <div class="task-meta">
+        <div class="meta-item">🕐 2:37 AM</div>
+        <div class="meta-item">⏰ Reminder Mon Mar 2 @ 1PM</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:8px">Completed</div>
+
+    <!-- PORTFOLIO -->
+    <div class="task">
+      <div class="task-stripe stripe-done"></div>
+      <div class="task-top">
+        <div class="task-name">✅ <a href="https://ethanfurstoss.github.io" target="_blank">Portfolio Site ↗</a></div>
+        <div class="badge badge-done">Done</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top">
+          <span class="progress-label">Live on GitHub Pages</span>
+          <span class="progress-pct">100%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill fill-done" style="width:100%"></div></div>
+      </div>
+      <div class="task-meta">
+        <div class="meta-item">🕐 Completed 2:48 AM</div>
+        <div class="meta-item green">✓ ethanfurstoss.github.io</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- PENDING -->
-  <div class="task">
-    <div class="task-header">
-      <div class="task-name">🌐 iMessage Fix</div>
-      <div class="badge pending">PENDING</div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- SUMMARY -->
+    <div class="widget">
+      <div class="widget-title">Summary</div>
+      <div class="summary-row"><span class="summary-label">Building</span><span class="summary-val val-running">1</span></div>
+      <div class="summary-row"><span class="summary-label">Blocked</span><span class="summary-val val-blocked">1</span></div>
+      <div class="summary-row"><span class="summary-label">Queued</span><span class="summary-val val-pending">2</span></div>
+      <div class="summary-row"><span class="summary-label">Completed</span><span class="summary-val val-done">1</span></div>
     </div>
-    <div class="progress-wrap">
-      <div class="progress-meta"><span>imsg rpc error</span><span class="pct">10%</span></div>
-      <div class="progress-bar"><div class="progress-fill pending" style="width:10%"></div></div>
+
+    <!-- QUICK LINKS -->
+    <div class="widget">
+      <div class="widget-title">Quick Links</div>
+      <a class="link-btn" href="https://ethanfurstoss.github.io" target="_blank"><span class="link-icon">🌐</span> Portfolio Site</a>
+      <a class="link-btn" href="https://github.com/EthanFurstoss" target="_blank"><span class="link-icon">🐙</span> GitHub</a>
+      <a class="link-btn" href="https://www.linkedin.com/in/ethanfurstoss/" target="_blank"><span class="link-icon">💼</span> LinkedIn</a>
+      <a class="link-btn" href="https://console.anthropic.com/usage" target="_blank"><span class="link-icon">📊</span> Claude Usage</a>
+      <a class="link-btn" href="https://hivemoderation.com" target="_blank"><span class="link-icon">🤖</span> Hive API</a>
     </div>
-    <div class="task-meta"><span>🕐 Queued</span><span class="eta">⏱ ~5 min when started</span></div>
+
+    <!-- RECENT ACTIVITY -->
+    <div class="widget">
+      <div class="widget-title">Recent Activity</div>
+      <div style="font-size:0.75rem;color:var(--text3);line-height:1.9">
+        <div>✅ Deployed activity dashboard</div>
+        <div>✅ Portfolio live on GitHub</div>
+        <div>✅ GitHub auth connected</div>
+        <div>✅ Brave search configured</div>
+        <div>✅ Chrome relay connected</div>
+        <div>✅ iMessage tested</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- PAUSED -->
-  <div class="task">
-    <div class="task-header">
-      <div class="task-name">🤖 AI Detector Site</div>
-      <div class="badge paused">PAUSED</div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-meta"><span>Needs Hive API key</span><span class="pct">5%</span></div>
-      <div class="progress-bar"><div class="progress-fill paused" style="width:5%"></div></div>
-    </div>
-    <div class="task-meta">
-      <span>🕐 2:37 AM</span>
-      <span>⏰ Reminder Mon Mar 2 @ 1PM</span>
-    </div>
-    <div class="task-desc">Paused. Get API key at <a href="https://hivemoderation.com" style="color:#4f8ef7" target="_blank">hivemoderation.com</a>.</div>
-  </div>
+  <div class="footer">Jarvis · Personal AI Assistant for Ethan Furstoss · Updates live</div>
 
-  <!-- DONE -->
-  <div class="task done">
-    <div class="task-header">
-      <div class="task-name">✅ <a href="https://ethanfurstoss.github.io" target="_blank">Portfolio Site</a></div>
-      <div class="badge done">DONE</div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-meta"><span>Live on GitHub Pages</span><span class="pct">100%</span></div>
-      <div class="progress-bar"><div class="progress-fill done" style="width:100%"></div></div>
-    </div>
-    <div class="task-meta">
-      <span>🕐 2:48 AM</span>
-      <span style="color:#4caf50">✓ ethanfurstoss.github.io</span>
-    </div>
-  </div>
+</div>
 
-  <div class="updated">Last updated: <span id="ts"></span></div>
+<script>
+  // Clock
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }
 
-  <script>
-    // PWA build: started 3:03 AM, estimated 15 min total
-    const pwaStart = new Date();
-    pwaStart.setHours(3, 3, 0, 0);
-    const pwaDurationMs = 15 * 60 * 1000; // 15 min estimate
+  // PWA build progress (started 3:03 AM, est 15 min)
+  const pwaStart = new Date(); pwaStart.setHours(3,3,0,0);
+  const pwaDur = 15 * 60 * 1000;
 
-    function updatePWA() {
-      const now = new Date();
-      const elapsed = now - pwaStart;
-      const rawPct = Math.min((elapsed / pwaDurationMs) * 100, 97); // cap at 97 until confirmed done
-      const pct = rawPct.toFixed(1);
-      const remaining = Math.max(0, pwaDurationMs - elapsed);
-      const remMin = Math.ceil(remaining / 60000);
+  function updatePWA() {
+    const elapsed = Date.now() - pwaStart;
+    const pct = Math.min(elapsed / pwaDur * 100, 97);
+    const rem = Math.max(0, pwaDur - elapsed);
+    const remMin = Math.ceil(rem / 60000);
+    document.getElementById('pwa-bar').style.width = pct.toFixed(1) + '%';
+    document.getElementById('pwa-pct').textContent = pct.toFixed(1) + '%';
+    document.getElementById('pwa-eta').textContent = rem > 0 ? `⏱ ~${remMin}m remaining` : '⏱ Wrapping up…';
+  }
 
-      document.getElementById('pwa-bar').style.width = pct + '%';
-      document.getElementById('pwa-pct').textContent = pct + '%';
-      document.getElementById('pwa-eta').textContent = remaining > 0
-        ? `⏱ ~${remMin} min remaining`
-        : '⏱ Finishing up...';
-    }
+  function toggleCmds() {
+    const b = document.getElementById('cmd-box');
+    b.style.display = b.style.display === 'block' ? 'none' : 'block';
+  }
 
-    function showCommands() {
-      const box = document.getElementById('commands-box');
-      box.style.display = box.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function tick() {
-      updatePWA();
-      document.getElementById('ts').textContent = new Date().toLocaleTimeString();
-    }
-
-    tick();
-    setInterval(tick, 1000);
-  </script>
+  function tick() { updateClock(); updatePWA(); }
+  tick();
+  setInterval(tick, 1000);
+</script>
 </body>
 </html>
