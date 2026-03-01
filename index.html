@@ -400,8 +400,13 @@
       // Live tasks
       if (d.tasks && d.tasks.length) {
         const col = document.getElementById('tasks-col');
-        const STATUS_ORDER = ['building','blocked','pending','paused','done'];
-        const sorted = [...d.tasks].sort((a,b) => STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status));
+        const STATUS_ORDER = ['building','blocked','pending','paused','queued','done'];
+        const sorted = [...d.tasks].sort((a,b) => {
+          const si = STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status);
+          if (si !== 0) return si;
+          // Within same status: most recently updated first
+          return new Date(b.updatedAt||0) - new Date(a.updatedAt||0);
+        });
         const active = sorted.filter(t => t.status !== 'done');
         const done = sorted.filter(t => t.status === 'done');
 
