@@ -187,32 +187,69 @@
   <div class="tasks-col">
     <div class="section-label">Active</div>
 
-    <!-- PWA -->
-    <div class="task glass" id="pwa-task">
-      <div class="task-glow" style="background: linear-gradient(90deg, #f87171, #ff6600);"></div>
+    <!-- VERIFAI BUILD -->
+    <div class="task glass">
+      <div class="task-glow" style="background:linear-gradient(90deg,#3b82f6,#8b5cf6)"></div>
       <div class="task-top">
-        <div class="task-name">💻 Jarvis Dashboard PWA</div>
-        <div class="badge" style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2)">⚠ Stalled</div>
+        <div class="task-name">🔍 Verifai — Build</div>
+        <div class="badge" style="background:rgba(59,130,246,0.12);color:#3b82f6;border:1px solid rgba(59,130,246,0.25)">Building</div>
       </div>
-      <!-- Stale alert -->
-      <div style="background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:0.76rem;color:rgba(248,113,113,0.9);line-height:1.5">
-        <strong style="display:block;margin-bottom:2px">⚠ Task stalled — agent crashed</strong>
-        Build agent hit a permission prompt and froze. Restarting now.
+      <div style="display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-size:0.58rem;padding:2px 7px;border-radius:10px;background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid rgba(59,130,246,0.2)">🌐 Web</span>
+        <span style="font-size:0.58rem;padding:2px 7px;border-radius:10px;background:rgba(99,102,241,0.1);color:#6366f1;border:1px solid rgba(99,102,241,0.2)">📱 iOS</span>
+        <span style="font-size:0.58rem;padding:2px 7px;border-radius:10px;background:rgba(139,92,246,0.1);color:#8b5cf6;border:1px solid rgba(139,92,246,0.2)">🤖 Android</span>
+        <span style="font-size:0.58rem;padding:2px 7px;border-radius:10px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.08)">Single codebase</span>
       </div>
       <div class="progress-area">
-        <div class="progress-top">
-          <span class="progress-label">Next.js · Vercel KV · PWA</span>
-          <span class="progress-pct" id="pwa-pct" style="color:#f87171">0%</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="pwa-bar" style="width:0%;background:#f87171"></div>
-        </div>
+        <div class="progress-top"><span class="progress-label">Expo · React Native Web · TypeScript</span><span class="progress-pct" style="color:#3b82f6">~</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:25%;background:linear-gradient(90deg,#3b82f6,#8b5cf6);animation:shimmer 2s linear infinite;background-size:200% 100%"></div></div>
       </div>
-      <div class="task-meta">
-        <div class="meta-item">🕐 Restarting…</div>
-        <div class="meta-item" id="pwa-eta" style="color:rgba(248,113,113,0.6)">⏱ ETA recalculating</div>
-      </div>
+      <div class="task-meta"><div class="meta-item">🕐 5:05 AM</div><div class="meta-item" style="color:rgba(59,130,246,0.6)">⚡ Agent: delta-haven</div></div>
     </div>
+
+    <!-- VERIFAI WEB DEPLOY -->
+    <div class="task glass">
+      <div class="task-glow" style="background:rgba(255,255,255,0.08)"></div>
+      <div class="task-top">
+        <div class="task-name">🌐 Verifai — Web Deploy</div>
+        <div class="badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)">Queued</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">Vercel · Auto-deploys after build</span><span class="progress-pct" style="color:rgba(255,255,255,0.3)">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%;background:rgba(59,130,246,0.4)"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 After build</div><div class="meta-item" style="color:rgba(59,130,246,0.4)">⚡ Auto-deploy watcher running</div></div>
+    </div>
+
+    <!-- VERIFAI iOS BUILD -->
+    <div class="task glass">
+      <div class="task-glow" style="background:rgba(255,255,255,0.08)"></div>
+      <div class="task-top">
+        <div class="task-name">📱 Verifai — iOS Build</div>
+        <div class="badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)">Queued</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">EAS Build · Preview profile · Shareable link</span><span class="progress-pct" style="color:rgba(255,255,255,0.3)">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%;background:rgba(99,102,241,0.4)"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 After build</div><div class="meta-item" style="color:rgba(99,102,241,0.4)">⏱ ~10 min on EAS</div></div>
+    </div>
+
+    <!-- VERIFAI ANDROID BUILD -->
+    <div class="task glass">
+      <div class="task-glow" style="background:rgba(255,255,255,0.08)"></div>
+      <div class="task-top">
+        <div class="task-name">🤖 Verifai — Android Build</div>
+        <div class="badge" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)">Queued</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">EAS Build · APK · Shareable download link</span><span class="progress-pct" style="color:rgba(255,255,255,0.3)">0%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:0%;background:rgba(139,92,246,0.4)"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 After build</div><div class="meta-item" style="color:rgba(139,92,246,0.4)">⏱ ~10 min on EAS</div></div>
+    </div>
+
+
 
     <!-- TAILSCALE -->
     <div class="task glass">
@@ -340,6 +377,62 @@
     </div>
 
     <div class="section-label" style="margin-top:6px">Completed</div>
+
+    <!-- DALL-E -->
+    <div class="task glass">
+      <div class="task-glow" style="background:linear-gradient(90deg,#34d399,#00ffaa)"></div>
+      <div class="task-top">
+        <div class="task-name">🎨 DALL-E Image Generation</div>
+        <div class="badge" style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)">Done</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">OpenAI DALL-E 3 · Sends images via Telegram</span><span class="progress-pct" style="color:#34d399">100%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#34d399,#00ffaa);box-shadow:0 0 8px #34d39966"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 4:16 AM</div><div class="meta-item" style="color:rgba(52,211,153,0.6)">✓ Live — say "generate an image of..."</div></div>
+    </div>
+
+    <!-- CLAUDE SPEND -->
+    <div class="task glass">
+      <div class="task-glow" style="background:linear-gradient(90deg,#34d399,#00ffaa)"></div>
+      <div class="task-top">
+        <div class="task-name">💸 Claude API Spend Tracker</div>
+        <div class="badge" style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)">Done</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">Local token tracking · Dashboard + PWA widget</span><span class="progress-pct" style="color:#34d399">100%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#34d399,#00ffaa);box-shadow:0 0 8px #34d39966"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 4:43 AM</div><div class="meta-item" style="color:rgba(52,211,153,0.6)">✓ Spend visible in sidebar</div></div>
+    </div>
+
+    <!-- BROWSER RELAY -->
+    <div class="task glass">
+      <div class="task-glow" style="background:linear-gradient(90deg,#34d399,#00ffaa)"></div>
+      <div class="task-top">
+        <div class="task-name">🧩 Browser Relay</div>
+        <div class="badge" style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)">Done</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">Chrome extension · OpenClaw browser control</span><span class="progress-pct" style="color:#34d399">100%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#34d399,#00ffaa);box-shadow:0 0 8px #34d39966"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 Early session</div><div class="meta-item" style="color:rgba(52,211,153,0.6)">✓ Connected</div></div>
+    </div>
+
+    <!-- JARVIS PWA DONE -->
+    <div class="task glass">
+      <div class="task-glow" style="background:linear-gradient(90deg,#34d399,#00ffaa)"></div>
+      <div class="task-top">
+        <div class="task-name">💻 <a href="https://jarvis-dashboard-beryl.vercel.app" target="_blank">Jarvis Dashboard PWA ↗</a></div>
+        <div class="badge" style="background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2)">Done</div>
+      </div>
+      <div class="progress-area">
+        <div class="progress-top"><span class="progress-label">Vercel · Liquid Glass · iOS/Android/Web</span><span class="progress-pct" style="color:#34d399">100%</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,#34d399,#00ffaa);box-shadow:0 0 8px #34d39966"></div></div>
+      </div>
+      <div class="task-meta"><div class="meta-item">🕐 4:38 AM</div><div class="meta-item" style="color:rgba(52,211,153,0.6)">✓ jarvis-dashboard-beryl.vercel.app</div></div>
+    </div>
 
     <!-- PORTFOLIO -->
     <div class="task glass">
