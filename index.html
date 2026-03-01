@@ -375,6 +375,25 @@
       </div>
     </div>
 
+    <!-- CLAUDE SPEND WIDGET -->
+    <div class="widget glass">
+      <div class="widget-title">💸 Claude API Spend</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="flex:1;background:rgba(0,170,255,0.07);border:1px solid rgba(0,170,255,0.15);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:1.1rem;font-weight:700;color:#00aaff" id="spend-month">—</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:2px">This Month</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:1.1rem;font-weight:700;color:rgba(255,255,255,0.6)" id="spend-total">—</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:2px">All Time</div>
+        </div>
+      </div>
+      <div class="summary-row"><span class="summary-label">Input tokens</span><span class="summary-val" id="spend-input" style="color:rgba(255,255,255,0.4)">—</span></div>
+      <div class="summary-row"><span class="summary-label">Output tokens</span><span class="summary-val" id="spend-output" style="color:rgba(255,255,255,0.4)">—</span></div>
+      <div class="summary-row"><span class="summary-label">Sessions tracked</span><span class="summary-val" id="spend-sessions" style="color:rgba(255,255,255,0.4)">—</span></div>
+      <div style="margin-top:10px;font-size:0.6rem;color:rgba(255,255,255,0.2)">Sonnet 4 · $3/MTok in · $15/MTok out</div>
+    </div>
+
     <div class="widget glass">
       <div class="widget-title">Recent Links</div>
       <a class="link-btn" href="https://jarvis-dashboard-beryl.vercel.app" target="_blank" style="background:rgba(0,170,255,0.08);border-color:rgba(0,170,255,0.3);color:#e0f0ff">
@@ -529,6 +548,18 @@
         document.getElementById('stat-max').textContent = fmtMs(Math.max(...times));
         document.getElementById('stat-count').textContent = times.length;
         drawSparkline(d.history);
+      }
+
+      // Spend widget
+      if (d.spend) {
+        const s = d.spend;
+        const fmt = v => v >= 1 ? '$' + v.toFixed(2) : (v * 100).toFixed(2) + '¢';
+        const fmtTok = v => v >= 1000000 ? (v/1000000).toFixed(2)+'M' : v >= 1000 ? (v/1000).toFixed(1)+'k' : v;
+        document.getElementById('spend-month').textContent = fmt(s.monthUsd || 0);
+        document.getElementById('spend-total').textContent = fmt(s.totalUsd || 0);
+        document.getElementById('spend-input').textContent = fmtTok(s.totalInputTokens || 0);
+        document.getElementById('spend-output').textContent = fmtTok(s.totalOutputTokens || 0);
+        document.getElementById('spend-sessions').textContent = s.sessionCount || 0;
       }
     } catch(e) { console.warn('metrics fetch failed', e); }
   }
