@@ -188,24 +188,29 @@
     <div class="section-label">Active</div>
 
     <!-- PWA -->
-    <div class="task glass">
-      <div class="task-glow" style="background: linear-gradient(90deg, #00aaff, #aa00ff);"></div>
+    <div class="task glass" id="pwa-task">
+      <div class="task-glow" style="background: linear-gradient(90deg, #f87171, #ff6600);"></div>
       <div class="task-top">
         <div class="task-name">💻 Jarvis Dashboard PWA</div>
-        <div class="badge" style="background:rgba(0,170,255,0.12);color:#00aaff;border:1px solid rgba(0,170,255,0.2)">Building</div>
+        <div class="badge" style="background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2)">⚠ Stalled</div>
+      </div>
+      <!-- Stale alert -->
+      <div style="background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:0.76rem;color:rgba(248,113,113,0.9);line-height:1.5">
+        <strong style="display:block;margin-bottom:2px">⚠ Task stalled — agent crashed</strong>
+        Build agent hit a permission prompt and froze. Restarting now.
       </div>
       <div class="progress-area">
         <div class="progress-top">
           <span class="progress-label">Next.js · Vercel KV · PWA</span>
-          <span class="progress-pct" id="pwa-pct" style="color:#00aaff">—</span>
+          <span class="progress-pct" id="pwa-pct" style="color:#f87171">0%</span>
         </div>
         <div class="progress-track">
-          <div class="progress-fill" id="pwa-bar" style="width:0%;background:linear-gradient(90deg,#00aaff,#aa00ff);background-size:200% 100%;animation:shimmer 2s linear infinite;box-shadow:0 0 8px #00aaff88"></div>
+          <div class="progress-fill" id="pwa-bar" style="width:0%;background:#f87171"></div>
         </div>
       </div>
       <div class="task-meta">
-        <div class="meta-item">🕐 Started 3:03 AM</div>
-        <div class="meta-item" id="pwa-eta" style="color:rgba(0,170,255,0.6)">⏱ Calculating…</div>
+        <div class="meta-item">🕐 Restarting…</div>
+        <div class="meta-item" id="pwa-eta" style="color:rgba(248,113,113,0.6)">⏱ ETA recalculating</div>
       </div>
     </div>
 
