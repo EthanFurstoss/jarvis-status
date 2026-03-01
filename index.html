@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jarvis Status</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f0f; color: #e8e8e8; font-family: -apple-system, sans-serif; padding: 24px; max-width: 680px; margin: 0 auto; }
+    h1 { font-size: 1.4rem; color: #4f8ef7; margin-bottom: 4px; }
+    .subtitle { color: #555; font-size: 0.8rem; margin-bottom: 28px; }
+
+    .task { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden; }
+    .task.blocked { border-color: #f5a623; box-shadow: 0 0 0 1px #f5a62344; }
+    .task.blocked::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #f5a623; }
+    .task.running::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #4f8ef7; }
+    .task.done::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: #4caf50; }
+
+    .task-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 8px; }
+    .task-name { font-weight: 600; font-size: 0.95rem; }
+    .task-name a { color: #e8e8e8; text-decoration: none; }
+    .task-name a:hover { color: #4f8ef7; }
+
+    .badge { font-size: 0.68rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; white-space: nowrap; letter-spacing: 0.5px; }
+    .badge.running { background: #1a3a6b; color: #4f8ef7; animation: pulse 1.5s infinite; }
+    .badge.done { background: #1a3a1a; color: #4caf50; }
+    .badge.pending { background: #2a2a2a; color: #888; }
+    .badge.paused { background: #2a2a1a; color: #aaa855; }
+    .badge.blocked { background: #3a2a00; color: #f5a623; animation: pulse 1.5s infinite; }
+
+    .blocked-banner { background: #2a1f00; border: 1px solid #f5a62366; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+    .blocked-banner .text { font-size: 0.82rem; color: #f5a623; line-height: 1.5; }
+    .blocked-banner .text strong { display: block; margin-bottom: 2px; }
+    .action-btn { display: inline-block; margin-top: 6px; background: #f5a623; color: #000; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 6px; text-decoration: none; }
+
+    .progress-wrap { margin-bottom: 8px; }
+    .progress-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-bottom: 5px; }
+    .progress-meta .pct { font-weight: 700; color: #aaa; transition: all 0.5s; }
+    .progress-bar { background: #2a2a2a; border-radius: 4px; height: 7px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 1s linear; }
+    .progress-fill.running { background: linear-gradient(90deg, #4f8ef7 0%, #7ab3ff 50%, #4f8ef7 100%); background-size: 200% 100%; animation: shimmer 2s linear infinite; }
+    .progress-fill.done { background: #4caf50; }
+    .progress-fill.pending { background: #3a3a3a; }
+    .progress-fill.paused { background: #6a6a30; }
+    .progress-fill.blocked { background: #f5a623; animation: shimmer 2s linear infinite; }
+
+    .task-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.75rem; color: #555; margin-top: 8px; }
+    .task-meta .eta { color: #4f8ef7; }
+    .task-desc { color: #777; font-size: 0.8rem; margin-top: 6px; line-height: 1.5; }
+    .updated { color: #333; font-size: 0.72rem; text-align: right; margin-top: 20px; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+  </style>
+</head>
+<body>
+  <h1>🤖 Jarvis Status</h1>
+  <div class="subtitle">Live task tracker · updates every second</div>
+
+  <!-- BUILDING -->
+  <div class="task running">
+    <div class="task-header">
+      <div class="task-name">💻 Jarvis Dashboard PWA</div>
+      <div class="badge running">BUILDING</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Next.js + Vercel KV + PWA</span>
+        <span class="pct" id="pwa-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill running" id="pwa-bar" style="width:0%"></div></div>
+    </div>
+    <div class="task-meta">
+      <span>🕐 Started: 3:03 AM</span>
+      <span class="eta" id="pwa-eta">⏱ Calculating...</span>
+    </div>
+    <div class="task-desc">Building Next.js 14 PWA with live activity feed, Vercel KV storage, and iPhone home screen support.</div>
+  </div>
+
+  <!-- BLOCKED -->
+  <div class="task blocked">
+    <div class="task-header">
+      <div class="task-name">🔧 Tailscale Setup</div>
+      <div class="badge blocked">⚠ BLOCKED</div>
+    </div>
+    <div class="blocked-banner">
+      <div class="text">
+        <strong>🙋 Action needed from Ethan</strong>
+        Run two Terminal commands to start the Tailscale daemon.
+        <a class="action-btn" onclick="showCommands()">📋 Show Commands</a>
+      </div>
+    </div>
+    <div id="commands-box" style="display:none;background:#111;border-radius:8px;padding:12px;margin-bottom:10px;font-size:0.8rem;">
+      <div style="color:#888;margin-bottom:6px">Step 1:</div>
+      <code style="color:#4f8ef7;display:block;margin-bottom:10px">sudo tailscaled &</code>
+      <div style="color:#888;margin-bottom:6px">Step 2:</div>
+      <code style="color:#4f8ef7;display:block">tailscale up</code>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span>Installed · daemon not running</span><span class="pct">60%</span></div>
+      <div class="progress-bar"><div class="progress-fill blocked" style="width:60%"></div></div>
+    </div>
+    <div class="task-meta">
+      <span>🕐 Started: 2:50 AM</span>
+      <span class="eta">⏱ ~2 min after action</span>
+    </div>
+  </div>
+
+  <!-- PENDING -->
+  <div class="task">
+    <div class="task-header">
+      <div class="task-name">🌐 iMessage Fix</div>
+      <div class="badge pending">PENDING</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span>imsg rpc error</span><span class="pct">10%</span></div>
+      <div class="progress-bar"><div class="progress-fill pending" style="width:10%"></div></div>
+    </div>
+    <div class="task-meta"><span>🕐 Queued</span><span class="eta">⏱ ~5 min when started</span></div>
+  </div>
+
+  <!-- PAUSED -->
+  <div class="task">
+    <div class="task-header">
+      <div class="task-name">🤖 AI Detector Site</div>
+      <div class="badge paused">PAUSED</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span>Needs Hive API key</span><span class="pct">5%</span></div>
+      <div class="progress-bar"><div class="progress-fill paused" style="width:5%"></div></div>
+    </div>
+    <div class="task-meta">
+      <span>🕐 2:37 AM</span>
+      <span>⏰ Reminder Mon Mar 2 @ 1PM</span>
+    </div>
+    <div class="task-desc">Paused. Get API key at <a href="https://hivemoderation.com" style="color:#4f8ef7" target="_blank">hivemoderation.com</a>.</div>
+  </div>
+
+  <!-- DONE -->
+  <div class="task done">
+    <div class="task-header">
+      <div class="task-name">✅ <a href="https://ethanfurstoss.github.io" target="_blank">Portfolio Site</a></div>
+      <div class="badge done">DONE</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-meta"><span>Live on GitHub Pages</span><span class="pct">100%</span></div>
+      <div class="progress-bar"><div class="progress-fill done" style="width:100%"></div></div>
+    </div>
+    <div class="task-meta">
+      <span>🕐 2:48 AM</span>
+      <span style="color:#4caf50">✓ ethanfurstoss.github.io</span>
+    </div>
+  </div>
+
+  <div class="updated">Last updated: <span id="ts"></span></div>
+
+  <script>
+    // PWA build: started 3:03 AM, estimated 15 min total
+    const pwaStart = new Date();
+    pwaStart.setHours(3, 3, 0, 0);
+    const pwaDurationMs = 15 * 60 * 1000; // 15 min estimate
+
+    function updatePWA() {
+      const now = new Date();
+      const elapsed = now - pwaStart;
+      const rawPct = Math.min((elapsed / pwaDurationMs) * 100, 97); // cap at 97 until confirmed done
+      const pct = rawPct.toFixed(1);
+      const remaining = Math.max(0, pwaDurationMs - elapsed);
+      const remMin = Math.ceil(remaining / 60000);
+
+      document.getElementById('pwa-bar').style.width = pct + '%';
+      document.getElementById('pwa-pct').textContent = pct + '%';
+      document.getElementById('pwa-eta').textContent = remaining > 0
+        ? `⏱ ~${remMin} min remaining`
+        : '⏱ Finishing up...';
+    }
+
+    function showCommands() {
+      const box = document.getElementById('commands-box');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function tick() {
+      updatePWA();
+      document.getElementById('ts').textContent = new Date().toLocaleTimeString();
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
