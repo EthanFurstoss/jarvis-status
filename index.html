@@ -342,6 +342,60 @@
     </div>
   </div>
 
+  <!-- METRICS SECTION -->
+  <div style="grid-column:1/-1">
+    <div class="section-label" style="margin-bottom:12px">Response Monitor</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px" id="metrics-grid">
+
+      <!-- Last message -->
+      <div class="glass" style="border-radius:12px;padding:18px">
+        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Last Message</div>
+        <div id="last-msg-text" style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:8px">Loading...</div>
+        <div id="last-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.2)"></div>
+      </div>
+
+      <!-- Active response -->
+      <div class="glass" style="border-radius:12px;padding:18px">
+        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Jarvis Response</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div id="response-status-dot" style="width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0"></div>
+          <div id="response-status-text" style="font-size:0.72rem;font-weight:600;color:#34d399">Idle</div>
+        </div>
+        <div id="response-text" style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:8px">—</div>
+        <div id="response-duration" style="font-size:0.68rem;color:rgba(0,170,255,0.6)"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="glass" style="border-radius:12px;padding:18px">
+        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Performance</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Avg response</span>
+            <span id="stat-avg" style="font-size:0.75rem;font-weight:600;color:#00aaff">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Fastest</span>
+            <span id="stat-min" style="font-size:0.75rem;font-weight:600;color:#34d399">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Slowest</span>
+            <span id="stat-max" style="font-size:0.75rem;font-weight:600;color:#f59e0b">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Samples</span>
+            <span id="stat-count" style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.4)">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sparkline chart -->
+    <div class="glass" style="border-radius:12px;padding:18px">
+      <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:14px">Response Time History (ms)</div>
+      <canvas id="sparkline" height="60" style="width:100%;display:block"></canvas>
+    </div>
+  </div>
+
   <footer>Jarvis · Personal AI Assistant for Ethan Furstoss · Updates live</footer>
 </div>
 
@@ -366,6 +420,117 @@
   }
   function tick() { updateClock(); updatePWA(); }
   tick(); setInterval(tick, 1000);
+
+  // Metrics
+  const GIST_URL = 'https://gist.githubusercontent.com/EthanFurstoss/dd32418517af918505d3a02312dc130a/raw/jarvis-metrics.json';
+
+  function timeAgo(ts) {
+    const s = Math.floor((Date.now() - new Date(ts)) / 1000);
+    if (s < 60) return `${s}s ago`;
+    if (s < 3600) return `${Math.floor(s/60)}m ago`;
+    return `${Math.floor(s/3600)}h ago`;
+  }
+
+  function fmtMs(ms) {
+    return ms >= 1000 ? (ms/1000).toFixed(1) + 's' : ms + 'ms';
+  }
+
+  function drawSparkline(history) {
+    const canvas = document.getElementById('sparkline');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    canvas.height = 60 * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    const W = canvas.offsetWidth, H = 60;
+    ctx.clearRect(0,0,W,H);
+    if (!history || history.length < 2) return;
+    const vals = history.map(h => h.durationMs);
+    const min = Math.min(...vals), max = Math.max(...vals);
+    const range = max - min || 1;
+    const pts = vals.map((v,i) => ({ x: (i/(vals.length-1))*W, y: H - ((v-min)/range)*(H-12)-6 }));
+
+    // Fill
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(0,170,255,0.15)');
+    grad.addColorStop(1,'rgba(0,170,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, H);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, H);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle = 'rgba(0,170,255,0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Dots
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,170,255,0.9)';
+      ctx.fill();
+    });
+
+    // Labels
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    ctx.font = '9px Inter,sans-serif';
+    ctx.fillText(fmtMs(max), 4, 10);
+    ctx.fillText(fmtMs(min), 4, H-4);
+  }
+
+  async function fetchMetrics() {
+    try {
+      const r = await fetch(GIST_URL + '?t=' + Date.now());
+      const d = await r.json();
+
+      // Last message
+      if (d.lastMessage) {
+        document.getElementById('last-msg-text').textContent = d.lastMessage.text;
+        document.getElementById('last-msg-time').textContent = timeAgo(d.lastMessage.timestamp);
+      }
+
+      // Response
+      if (d.activeResponse) {
+        const ar = d.activeResponse;
+        const dot = document.getElementById('response-status-dot');
+        const stxt = document.getElementById('response-status-text');
+        if (ar.status === 'thinking') {
+          dot.style.background = '#f59e0b';
+          dot.style.boxShadow = '0 0 8px #f59e0baa';
+          dot.style.animation = 'pulse 1s infinite';
+          stxt.textContent = 'Thinking…';
+          stxt.style.color = '#f59e0b';
+        } else {
+          dot.style.background = '#34d399';
+          dot.style.boxShadow = '0 0 8px #34d399aa';
+          dot.style.animation = '';
+          stxt.textContent = 'Idle';
+          stxt.style.color = '#34d399';
+        }
+        document.getElementById('response-text').textContent = ar.text || '—';
+        document.getElementById('response-duration').textContent = ar.durationMs ? `⏱ ${fmtMs(ar.durationMs)}` : '';
+      }
+
+      // Stats
+      if (d.history && d.history.length) {
+        const times = d.history.map(h => h.durationMs);
+        const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+        document.getElementById('stat-avg').textContent = fmtMs(avg);
+        document.getElementById('stat-min').textContent = fmtMs(Math.min(...times));
+        document.getElementById('stat-max').textContent = fmtMs(Math.max(...times));
+        document.getElementById('stat-count').textContent = times.length;
+        drawSparkline(d.history);
+      }
+    } catch(e) { console.warn('metrics fetch failed', e); }
+  }
+
+  fetchMetrics();
+  setInterval(fetchMetrics, 8000);
 </script>
 </body>
 </html>
