@@ -312,11 +312,33 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="widget glass">
-      <div class="widget-title">Summary</div>
-      <div class="summary-row"><span class="summary-label">Building</span><span class="summary-val" style="color:#00aaff">1</span></div>
-      <div class="summary-row"><span class="summary-label">Blocked</span><span class="summary-val" style="color:#f59e0b">1</span></div>
-      <div class="summary-row"><span class="summary-label">Queued</span><span class="summary-val" style="color:rgba(255,255,255,0.3)">2</span></div>
-      <div class="summary-row"><span class="summary-label">Completed</span><span class="summary-val" style="color:#34d399">1</span></div>
+      <div class="widget-title">Response Monitor</div>
+
+      <!-- Status row -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div id="response-status-dot" style="width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 6px #34d399aa;flex-shrink:0"></div>
+        <div id="response-status-text" style="font-size:0.72rem;font-weight:600;color:#34d399">Idle</div>
+        <div id="response-duration" style="font-size:0.68rem;color:rgba(255,255,255,0.2);margin-left:auto"></div>
+      </div>
+
+      <!-- Last message -->
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.2);margin-bottom:3px">Last message</div>
+      <div id="last-msg-text" style="font-size:0.75rem;color:rgba(255,255,255,0.55);line-height:1.4;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+      <div id="last-msg-time" style="font-size:0.65rem;color:rgba(255,255,255,0.18);margin-bottom:12px"></div>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid rgba(255,255,255,0.05);margin-bottom:10px"></div>
+
+      <!-- Stats -->
+      <div class="summary-row"><span class="summary-label">Avg response</span><span class="summary-val" id="stat-avg" style="color:#00aaff">—</span></div>
+      <div class="summary-row"><span class="summary-label">Fastest</span><span class="summary-val" id="stat-min" style="color:#34d399">—</span></div>
+      <div class="summary-row"><span class="summary-label">Slowest</span><span class="summary-val" id="stat-max" style="color:#f59e0b">—</span></div>
+      <div class="summary-row"><span class="summary-label">Samples</span><span class="summary-val" id="stat-count" style="color:rgba(255,255,255,0.3)">—</span></div>
+
+      <!-- Sparkline -->
+      <div style="margin-top:10px">
+        <canvas id="sparkline" height="36" style="width:100%;display:block"></canvas>
+      </div>
     </div>
 
     <div class="widget glass">
@@ -339,60 +361,6 @@
       <div class="activity-item">✅ Brave search configured</div>
       <div class="activity-item">✅ Chrome relay connected</div>
       <div class="activity-item">✅ iMessage tested</div>
-    </div>
-  </div>
-
-  <!-- METRICS SECTION -->
-  <div style="grid-column:1/-1">
-    <div class="section-label" style="margin-bottom:12px">Response Monitor</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px" id="metrics-grid">
-
-      <!-- Last message -->
-      <div class="glass" style="border-radius:12px;padding:18px">
-        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Last Message</div>
-        <div id="last-msg-text" style="font-size:0.82rem;color:rgba(255,255,255,0.7);line-height:1.5;margin-bottom:8px">Loading...</div>
-        <div id="last-msg-time" style="font-size:0.68rem;color:rgba(255,255,255,0.2)"></div>
-      </div>
-
-      <!-- Active response -->
-      <div class="glass" style="border-radius:12px;padding:18px">
-        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Jarvis Response</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div id="response-status-dot" style="width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0"></div>
-          <div id="response-status-text" style="font-size:0.72rem;font-weight:600;color:#34d399">Idle</div>
-        </div>
-        <div id="response-text" style="font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:8px">—</div>
-        <div id="response-duration" style="font-size:0.68rem;color:rgba(0,170,255,0.6)"></div>
-      </div>
-
-      <!-- Stats -->
-      <div class="glass" style="border-radius:12px;padding:18px">
-        <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:10px">Performance</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Avg response</span>
-            <span id="stat-avg" style="font-size:0.75rem;font-weight:600;color:#00aaff">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Fastest</span>
-            <span id="stat-min" style="font-size:0.75rem;font-weight:600;color:#34d399">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Slowest</span>
-            <span id="stat-max" style="font-size:0.75rem;font-weight:600;color:#f59e0b">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.7rem;color:rgba(255,255,255,0.3)">Samples</span>
-            <span id="stat-count" style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.4)">—</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sparkline chart -->
-    <div class="glass" style="border-radius:12px;padding:18px">
-      <div style="font-size:0.62rem;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:rgba(255,255,255,0.18);margin-bottom:14px">Response Time History (ms)</div>
-      <canvas id="sparkline" height="60" style="width:100%;display:block"></canvas>
     </div>
   </div>
 
