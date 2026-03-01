@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Style Picker — Jarvis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; color: #eee; font-family: 'Inter', sans-serif; padding: 32px 24px; }
+    h1 { font-size: 1.2rem; color: #fff; margin-bottom: 4px; }
+    .sub { color: #555; font-size: 0.8rem; margin-bottom: 36px; }
+    .back { font-size: 0.75rem; color: #4f8ef7; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px; }
+    .back:hover { text-decoration: underline; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+    .style-card { border-radius: 14px; overflow: hidden; position: relative; }
+    .preview { padding: 20px; min-height: 220px; }
+    .footer-bar {
+      padding: 14px 16px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .pick-btn {
+      font-size: 0.72rem; font-weight: 700; padding: 7px 16px;
+      border-radius: 8px; border: none; cursor: pointer;
+      text-decoration: none; display: inline-block;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .pick-btn:hover { opacity: 0.85; transform: scale(0.97); }
+    .pick-btn:active { transform: scale(0.93); }
+
+    /* 1 Linear */
+    .s1 { background: #0f0f11; border: 1px solid #222; box-shadow: 0 0 40px #4f8ef711; }
+    .s1 .footer-bar { background: #0f0f11; border-top: 1px solid #1e1e1e; color: #fff; }
+    .s1 .pick-btn { background: #4f8ef7; color: #fff; }
+    .s1 .bar { background: #1a1a1f; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a30; }
+    .s1 .bl { font-size: 0.73rem; color: #aaa; }
+    .s1 .bt { width: 80px; height: 4px; background: #2a2a30; border-radius: 2px; overflow: hidden; }
+    .s1 .bf { height: 100%; background: #4f8ef7; }
+    .s1 .bdg { font-size: 0.58rem; background: #1a3a6b; color: #4f8ef7; padding: 2px 7px; border-radius: 4px; font-weight: 700; }
+
+    /* 2 Glass */
+    .s2 { background: linear-gradient(135deg, #0a0a1a, #0a1a2a); border: 1px solid #ffffff11; box-shadow: 0 0 60px #00aaff11; }
+    .s2 .footer-bar { background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-top: 1px solid #ffffff11; color: #fff; }
+    .s2 .pick-btn { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .s2 .gc { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; margin-bottom: 8px; }
+    .s2 .gt { font-size: 0.75rem; color: rgba(255,255,255,0.75); margin-bottom: 6px; }
+    .s2 .gb { height: 3px; border-radius: 2px; }
+    .s2 .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+    /* 3 Terminal */
+    .s3 { background: #000; border: 1px solid #00ff4122; font-family: 'JetBrains Mono', monospace; }
+    .s3 .footer-bar { background: #000; border-top: 1px solid #00ff4122; color: #00ff41; }
+    .s3 .pick-btn { background: transparent; color: #00ff41; border: 1px solid #00ff41; }
+    .s3 .ln { font-size: 0.7rem; color: #00ff41; margin-bottom: 4px; }
+    .s3 .ln.dim { color: #005510; }
+    .s3 .cursor { display: inline-block; width: 7px; height: 12px; background: #00ff41; animation: blink 1s infinite; vertical-align: middle; }
+    .s3 .bg { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .s3 .bg .lbl { font-size: 0.65rem; color: #005510; width: 110px; }
+    .s3 .bg .trk { flex: 1; height: 2px; background: #001500; }
+    .s3 .bg .fil { height: 100%; background: #00ff41; }
+
+    /* 4 Apple */
+    .s4 { background: #141414; border: 1px solid #2a2a2a; }
+    .s4 .footer-bar { background: #141414; border-top: 1px solid #1e1e1e; color: #fff; }
+    .s4 .pick-btn { background: #fff; color: #000; }
+    .s4 .row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #1e1e1e; }
+    .s4 .row:last-child { border: none; }
+    .s4 .rl { font-size: 0.75rem; color: #888; display: flex; align-items: center; gap: 8px; }
+    .s4 .rr { font-size: 0.75rem; font-weight: 500; }
+    .s4 .ib { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; }
+
+    /* 5 Neon */
+    .s5 { background: #07070d; border: 1px solid #ff00ff22; box-shadow: 0 0 40px #ff00ff08; }
+    .s5 .footer-bar { background: #07070d; border-top: 1px solid #ff00ff22; color: #ff00ff; }
+    .s5 .pick-btn { background: linear-gradient(135deg, #ff00ff, #7700ff); color: #fff; }
+    .s5 .nc { border: 1px solid #ff00ff33; border-radius: 8px; padding: 12px; margin-bottom: 8px; background: #0d0015; }
+    .s5 .nt { font-size: 0.68rem; color: #ff00ff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
+    .s5 .nb { height: 2px; border-radius: 1px; background: #1a001a; margin-bottom: 3px; }
+    .s5 .nf { height: 100%; border-radius: 1px; }
+    .s5 .np { font-size: 0.63rem; color: #660066; font-family: 'JetBrains Mono', monospace; }
+
+    /* 6 Notion */
+    .s6 { background: #191919; border: 1px solid #2a2a2a; }
+    .s6 .footer-bar { background: #191919; border-top: 1px solid #222; color: #fff; }
+    .s6 .pick-btn { background: #333; color: #fff; }
+    .s6 .blk { padding: 9px 10px; border-radius: 6px; margin-bottom: 6px; background: #222; display: flex; gap: 9px; align-items: flex-start; }
+    .s6 .bi { font-size: 0.82rem; flex-shrink: 0; margin-top: 1px; }
+    .s6 .bt2 { font-size: 0.75rem; color: #ddd; font-weight: 500; }
+    .s6 .bs { font-size: 0.65rem; color: #555; margin-top: 1px; }
+    .s6 .sd { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a3a6b; color: #4f8ef7; border: 1px solid #4f8ef7; padding: 10px 20px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <a class="back" href="/">← Back to Dashboard</a>
+  <h1>🎨 Pick a Style</h1>
+  <div class="sub">Tap "Pick this" — it'll open Telegram with your selection ready to send</div>
+
+  <div class="grid">
+
+    <!-- 1 Linear -->
+    <div class="style-card s1">
+      <div class="preview">
+        <div style="font-size:0.65rem;color:#333;margin-bottom:10px;letter-spacing:1.5px;text-transform:uppercase">Active Tasks</div>
+        <div class="bar"><div class="bl">💻 PWA Build</div><div style="display:flex;align-items:center;gap:8px"><div class="bt"><div class="bf" style="width:65%"></div></div><div class="bdg">Building</div></div></div>
+        <div class="bar"><div class="bl">🔧 Tailscale</div><div style="display:flex;align-items:center;gap:8px"><div class="bt"><div class="bf" style="width:60%;background:#f59e0b"></div></div><div class="bdg" style="background:#3a2a00;color:#f59e0b">Blocked</div></div></div>
+        <div class="bar"><div class="bl">✅ Portfolio</div><div style="display:flex;align-items:center;gap:8px"><div class="bt"><div class="bf" style="width:100%;background:#34d399"></div></div><div class="bdg" style="background:#0d2e22;color:#34d399">Done</div></div></div>
+      </div>
+      <div class="footer-bar">1 — Linear / Vercel <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_1" target="_blank">Pick this →</a></div>
+    </div>
+
+    <!-- 2 Glass -->
+    <div class="style-card s2">
+      <div class="preview">
+        <div style="font-size:0.65rem;color:#ffffff22;margin-bottom:10px;letter-spacing:1.5px;text-transform:uppercase">Active Tasks</div>
+        <div class="gc"><div class="gt"><span class="dot" style="background:#00ffaa;box-shadow:0 0 6px #00ffaaaa"></span>💻 PWA Build — 65%</div><div class="gb" style="background:linear-gradient(90deg,#00aaff,#aa00ff);box-shadow:0 0 8px #00aaff88;width:65%"></div></div>
+        <div class="gc"><div class="gt"><span class="dot" style="background:#f59e0b;box-shadow:0 0 6px #f59e0baa"></span>🔧 Tailscale — Blocked</div><div class="gb" style="background:linear-gradient(90deg,#f59e0b,#ff6600);width:60%"></div></div>
+        <div class="gc"><div class="gt"><span class="dot" style="background:#34d399;box-shadow:0 0 6px #34d399aa"></span>✅ Portfolio — Done</div><div class="gb" style="background:linear-gradient(90deg,#34d399,#00ffaa);width:100%"></div></div>
+      </div>
+      <div class="footer-bar">2 — Glassmorphism <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_2" target="_blank">Pick this →</a></div>
+    </div>
+
+    <!-- 3 Terminal -->
+    <div class="style-card s3">
+      <div class="preview">
+        <div class="ln dim">// jarvis@ethan-mbp ~ status</div>
+        <div class="ln">> loading tasks... <span class="cursor"></span></div>
+        <div style="margin-top:10px">
+          <div class="bg"><div class="lbl">PWA_BUILD</div><div class="trk"><div class="fil" style="width:65%"></div></div><span style="font-size:0.62rem;color:#00ff41">65.3%</span></div>
+          <div class="bg"><div class="lbl">TAILSCALE</div><div class="trk"><div class="fil" style="width:60%;background:#f59e0b"></div></div><span style="font-size:0.62rem;color:#f59e0b">BLOCKED</span></div>
+          <div class="bg"><div class="lbl">PORTFOLIO</div><div class="trk"><div class="fil" style="width:100%"></div></div><span style="font-size:0.62rem;color:#00ff41">DONE ✓</span></div>
+        </div>
+        <div class="ln dim" style="margin-top:8px">3 tasks · 1 blocked · 1 done</div>
+      </div>
+      <div class="footer-bar">3 — Terminal / Hacker <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_3" target="_blank">Pick this →</a></div>
+    </div>
+
+    <!-- 4 Apple -->
+    <div class="style-card s4">
+      <div class="preview">
+        <div style="font-size:0.65rem;color:#333;margin-bottom:10px;letter-spacing:1.5px;text-transform:uppercase">Tasks</div>
+        <div class="row"><div class="rl"><div class="ib" style="background:#1a3a6b">💻</div>PWA Build</div><div class="rr" style="color:#4f8ef7">65% ·&nbsp;Building</div></div>
+        <div class="row"><div class="rl"><div class="ib" style="background:#3a2a00">🔧</div>Tailscale</div><div class="rr" style="color:#f59e0b">⚠ Blocked</div></div>
+        <div class="row"><div class="rl"><div class="ib" style="background:#0d2e22">✅</div>Portfolio</div><div class="rr" style="color:#34d399">Live ↗</div></div>
+      </div>
+      <div class="footer-bar">4 — Apple / Minimal <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_4" target="_blank">Pick this →</a></div>
+    </div>
+
+    <!-- 5 Neon -->
+    <div class="style-card s5">
+      <div class="preview">
+        <div style="font-size:0.63rem;color:#ff00ff44;margin-bottom:10px;letter-spacing:2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace">// STATUS</div>
+        <div class="nc"><div class="nt">💻 PWA Build</div><div class="nb"><div class="nf" style="width:65%;background:linear-gradient(90deg,#ff00ff,#7700ff);box-shadow:0 0 8px #ff00ff88"></div></div><div class="np">65.3% · ~5m remaining</div></div>
+        <div class="nc" style="border-color:#f59e0b33;background:#150a00"><div class="nt" style="color:#f59e0b">🔧 Tailscale ⚠</div><div class="nb"><div class="nf" style="width:60%;background:linear-gradient(90deg,#f59e0b,#ff6600);box-shadow:0 0 6px #f59e0b88"></div></div><div class="np" style="color:#664400">BLOCKED</div></div>
+        <div class="nc" style="border-color:#34d39933;background:#001510"><div class="nt" style="color:#34d399">✅ Portfolio</div><div class="nb"><div class="nf" style="width:100%;background:linear-gradient(90deg,#34d399,#00ffaa);box-shadow:0 0 6px #34d39988"></div></div><div class="np" style="color:#006633">COMPLETE</div></div>
+      </div>
+      <div class="footer-bar">5 — Neon / Cyberpunk <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_5" target="_blank">Pick this →</a></div>
+    </div>
+
+    <!-- 6 Notion -->
+    <div class="style-card s6">
+      <div class="preview">
+        <div style="font-size:0.65rem;color:#333;margin-bottom:10px;letter-spacing:1.5px;text-transform:uppercase">Tasks</div>
+        <div class="blk"><div class="bi">💻</div><div><div class="bt2">PWA Build</div><div class="bs"><span class="sd" style="background:#4f8ef7"></span>Building · 65% · ~5m left</div></div></div>
+        <div class="blk"><div class="bi">🔧</div><div><div class="bt2">Tailscale</div><div class="bs"><span class="sd" style="background:#f59e0b"></span>Blocked — action needed</div></div></div>
+        <div class="blk"><div class="bi">✅</div><div><div class="bt2">Portfolio Site</div><div class="bs"><span class="sd" style="background:#34d399"></span>Done · ethanfurstoss.github.io</div></div></div>
+      </div>
+      <div class="footer-bar">6 — Notion / Clean <a class="pick-btn" href="https://t.me/milksteak_bot?start=style_6" target="_blank">Pick this →</a></div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:28px;font-size:0.75rem;color:#333;text-align:center">
+    Tap "Pick this" → opens Telegram → hit send → Jarvis rebuilds the dashboard instantly
+  </div>
+
+  <div class="toast" id="toast">Opening Telegram…</div>
+</body>
+</html>
