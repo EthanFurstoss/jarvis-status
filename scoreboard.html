@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scoreboard — Jarvis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #070712;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 20%, #0a1a3a44, transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, #0a0a2a44, transparent),
+        radial-gradient(ellipse 40% 60% at 60% 10%, #1a0a3a22, transparent);
+      color: #f0f0f2;
+      font-family: var(--font);
+      min-height: 100vh;
+      padding: 28px 20px 60px;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+
+    .glass {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Header */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px; border-radius: 14px; margin-bottom: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: #00d4ff;
+      box-shadow: 0 0 12px #00d4ffcc, 0 0 24px #00d4ff66;
+      animation: breathe 2.5s ease-in-out infinite;
+    }
+    .title { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { font-size: 0.68rem; color: rgba(255,255,255,0.32); margin-top: 1px; }
+    .back-link { font-size: 0.7rem; color: rgba(255,255,255,0.35); text-decoration: none; }
+    .back-link:hover { color: #00d4ff; }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.78); font-size: 0.78rem; font-weight: 600;
+      padding: 9px 15px; border-radius: 9px; cursor: pointer;
+      font-family: var(--font); transition: all 0.15s;
+    }
+    .btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
+    .btn.primary { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.35); color: #00d4ff; }
+    .btn.danger:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: #f87171; }
+
+    /* Teams grid */
+    .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+
+    .team-card {
+      border-radius: 16px; padding: 0; overflow: hidden;
+      display: flex; flex-direction: column; position: relative;
+      transition: transform 0.15s, border-color 0.2s;
+    }
+    .team-card.leader { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08); }
+    .team-accent { height: 4px; width: 100%; }
+
+    .team-head { padding: 18px 20px 14px; }
+    .team-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .team-name {
+      flex: 1; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.3px;
+      background: transparent; border: none; color: #f0f0f2; font-family: var(--font);
+      border-bottom: 1px solid transparent; padding: 2px 2px; min-width: 0;
+    }
+    .team-name:focus { outline: none; border-bottom-color: rgba(0,212,255,0.4); }
+    .crown { font-size: 1rem; flex-shrink: 0; }
+    .team-x {
+      background: transparent; border: none; color: rgba(255,255,255,0.25);
+      cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 6px; line-height: 1;
+    }
+    .team-x:hover { color: #f87171; background: rgba(239,68,68,0.1); }
+
+    .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 20px; }
+    .score-num {
+      font-family: var(--mono); font-size: 3.4rem; font-weight: 700; line-height: 1;
+      font-variant-numeric: tabular-nums; letter-spacing: -2px;
+    }
+    .score-controls { display: flex; flex-direction: column; gap: 8px; }
+    .score-btn {
+      width: 46px; height: 38px; border-radius: 10px; cursor: pointer;
+      font-size: 1.3rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f0f0f2;
+      transition: all 0.12s; user-select: none;
+    }
+    .score-btn.plus { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.3); color: #34d399; font-size: 1.5rem; height: 56px; }
+    .score-btn.plus:hover { background: rgba(52,211,153,0.22); transform: scale(1.05); }
+    .score-btn.plus:active { transform: scale(0.94); }
+    .score-btn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+
+    /* Players */
+    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 14px 20px 18px; }
+    .players-title {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+      color: rgba(255,255,255,0.22); margin-bottom: 10px;
+    }
+    .player-row {
+      display: flex; align-items: center; gap: 8px; padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .player-row:last-child { border-bottom: none; }
+    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.82); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-pts {
+      font-family: var(--mono); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums;
+      min-width: 42px; text-align: right;
+    }
+    .pbtn {
+      width: 26px; height: 26px; border-radius: 7px; cursor: pointer; flex-shrink: 0;
+      font-size: 0.78rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+      transition: all 0.12s; user-select: none;
+    }
+    .pbtn.p-half { font-size: 0.6rem; width: 30px; }
+    .pbtn.plus:hover { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.35); color: #34d399; }
+    .pbtn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+    .pbtn.del:hover { background: rgba(239,68,68,0.12); color: #f87171; }
+
+    .add-player { display: flex; gap: 8px; margin-top: 12px; }
+    .add-player input {
+      flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 11px; color: #f0f0f2; font-size: 0.78rem; font-family: var(--font);
+    }
+    .add-player input:focus { outline: none; border-color: rgba(0,212,255,0.4); }
+    .add-player button {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: rgba(255,255,255,0.7); cursor: pointer; padding: 0 13px;
+      font-size: 0.78rem; font-weight: 600; transition: all 0.12s;
+    }
+    .add-player button:hover { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
+
+    .player-sum { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-top: 10px; text-align: right; }
+    .player-sum.mismatch { color: #f59e0b; }
+
+    .empty {
+      text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3);
+      border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);
+    }
+    .empty-hint { font-size: 0.8rem; margin-top: 8px; }
+
+    .hint { font-size: 0.62rem; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+    @keyframes breathe { 0%,100%{box-shadow:0 0 10px #00d4ffcc,0 0 20px #00d4ff66} 50%{box-shadow:0 0 20px #00d4ffff,0 0 40px #00d4ffaa} }
+    @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
+    .pop { animation: pop 0.3s ease; }
+
+    @media(max-width:560px){ .teams { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="glass">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      <div>
+        <div class="title">🏆 Scoreboard</div>
+        <div class="subtitle">Track teams, players &amp; points — auto-saved</div>
+      </div>
+    </div>
+    <a class="back-link" href="/jarvis-status/index.html">← Back to Jarvis</a>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn primary" onclick="addTeam()">＋ Add Team</button>
+    <button class="btn" onclick="resetScores()">↺ Reset Scores</button>
+    <button class="btn danger" onclick="clearAll()">🗑 Clear All</button>
+  </div>
+
+  <div id="teams" class="teams"></div>
+
+</div>
+
+<script>
+  const STORE_KEY = 'jarvis-scoreboard-v1';
+  const ACCENTS = [
+    { color: '#00d4ff', glow: 'linear-gradient(90deg,#00d4ff,#0066ff)' },
+    { color: '#f87171', glow: 'linear-gradient(90deg,#f87171,#ef4444)' },
+    { color: '#34d399', glow: 'linear-gradient(90deg,#34d399,#10b981)' },
+    { color: '#fbbf24', glow: 'linear-gradient(90deg,#fbbf24,#f59e0b)' },
+    { color: '#a78bfa', glow: 'linear-gradient(90deg,#a78bfa,#8b5cf6)' },
+    { color: '#f472b6', glow: 'linear-gradient(90deg,#f472b6,#ec4899)' },
+  ];
+
+  let state = load();
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    // Seed with two starter teams
+    return {
+      teams: [
+        { id: uid(), name: 'Team 1', accent: 0, players: [] },
+        { id: uid(), name: 'Team 2', accent: 1, players: [] },
+      ]
+    };
+  }
+
+  function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+  function uid() { return Math.random().toString(36).slice(2, 9); }
+
+  // Show whole numbers cleanly, decimals to 1 place (e.g. 3, 3.5)
+  function fmt(n) {
+    n = Math.round(n * 10) / 10;
+    return Number.isInteger(n) ? String(n) : n.toFixed(1);
+  }
+
+  function teamTotal(team) {
+    // The team score is tracked directly so it can differ from / lead the
+    // per-player breakdown, but +1 on a player also bumps the team.
+    return team.score || 0;
+  }
+  function playersTotal(team) {
+    return team.players.reduce((s, p) => s + (p.points || 0), 0);
+  }
+
+  function addTeam() {
+    const used = state.teams.map(t => t.accent);
+    let accent = ACCENTS.findIndex((_, i) => !used.includes(i));
+    if (accent === -1) accent = state.teams.length % ACCENTS.length;
+    state.teams.push({ id: uid(), name: 'Team ' + (state.teams.length + 1), accent, players: [], score: 0 });
+    save(); render();
+  }
+
+  function removeTeam(id) {
+    state.teams = state.teams.filter(t => t.id !== id);
+    save(); render();
+  }
+
+  function renameTeam(id, name) {
+    const t = state.teams.find(t => t.id === id);
+    if (t) { t.name = name; save(); }
+  }
+
+  function bumpTeam(id, delta) {
+    const t = state.teams.find(t => t.id === id);
+    if (!t) return;
+    t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10);
+    save();
+    const el = document.querySelector(`#score-${id}`);
+    if (el) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+    render();
+  }
+
+  function addPlayer(teamId, inputEl) {
+    const name = inputEl.value.trim();
+    if (!name) return;
+    const t = state.teams.find(t => t.id === teamId);
+    if (!t) return;
+    t.players.push({ id: uid(), name, points: 0 });
+    save(); render();
+    // refocus the input for the team after re-render
+    const next = document.querySelector(`#addinput-${teamId}`);
+    if (next) next.focus();
+  }
+
+  function removePlayer(teamId, pid) {
+    const t = state.teams.find(t => t.id === teamId);
+    if (!t) return;
+    t.players = t.players.filter(p => p.id !== pid);
+    save(); render();
+  }
+
+  function bumpPlayer(teamId, pid, delta) {
+    const t = state.teams.find(t => t.id === teamId);
+    if (!t) return;
+    const p = t.players.find(p => p.id === pid);
+    if (!p) return;
+    p.points = Math.max(0, Math.round((p.points + delta) * 10) / 10);
+    // A point scored by a player also counts toward the team score.
+    t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10);
+    save(); render();
+  }
+
+  function renamePlayer(teamId, pid, name) {
+    const t = state.teams.find(t => t.id === teamId);
+    if (!t) return;
+    const p = t.players.find(p => p.id === pid);
+    if (p) { p.name = name; save(); }
+  }
+
+  function resetScores() {
+    if (!confirm('Reset all team and player scores to 0? (Teams and players are kept.)')) return;
+    state.teams.forEach(t => { t.score = 0; t.players.forEach(p => p.points = 0); });
+    save(); render();
+  }
+
+  function clearAll() {
+    if (!confirm('Delete ALL teams and players? This cannot be undone.')) return;
+    state = { teams: [] };
+    save(); render();
+  }
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function render() {
+    const root = document.getElementById('teams');
+    if (!state.teams.length) {
+      root.innerHTML = `<div class="empty glass" style="grid-column:1/-1">
+        <div style="font-size:1.6rem">🏆</div>
+        <div class="empty-hint">No teams yet — hit <b>＋ Add Team</b> to start scoring.</div>
+      </div>`;
+      return;
+    }
+
+    const maxScore = Math.max(...state.teams.map(teamTotal));
+    const leaders = maxScore > 0 ? state.teams.filter(t => teamTotal(t) === maxScore).map(t => t.id) : [];
+
+    root.innerHTML = state.teams.map(t => {
+      const acc = ACCENTS[t.accent % ACCENTS.length];
+      const isLeader = leaders.includes(t.id);
+      const pTotal = playersTotal(t);
+      const mismatch = Math.round(pTotal * 10) !== Math.round(teamTotal(t) * 10);
+
+      const playerRows = t.players.length ? t.players.map(p => `
+        <div class="player-row">
+          <input class="player-name" value="${esc(p.name)}"
+                 onchange="renamePlayer('${t.id}','${p.id}',this.value)"
+                 style="background:transparent;border:none;border-bottom:1px solid transparent"
+                 onfocus="this.style.borderBottomColor='rgba(0,212,255,0.4)'"
+                 onblur="this.style.borderBottomColor='transparent'"/>
+          <span class="player-pts" style="color:${acc.color}">${fmt(p.points)}</span>
+          <button class="pbtn p-half minus" title="Subtract half" onclick="bumpPlayer('${t.id}','${p.id}',-0.5)">−½</button>
+          <button class="pbtn minus" title="Subtract 1" onclick="bumpPlayer('${t.id}','${p.id}',-1)">−</button>
+          <button class="pbtn p-half plus" title="Add half" onclick="bumpPlayer('${t.id}','${p.id}',0.5)">+½</button>
+          <button class="pbtn plus" title="Add 1" onclick="bumpPlayer('${t.id}','${p.id}',1)">＋</button>
+          <button class="pbtn del" title="Remove player" onclick="removePlayer('${t.id}','${p.id}')">✕</button>
+        </div>`).join('') : `<div style="font-size:0.74rem;color:rgba(255,255,255,0.25);padding:4px 0">No players yet.</div>`;
+
+      return `
+      <div class="team-card glass ${isLeader ? 'leader' : ''}">
+        <div class="team-accent" style="background:${acc.glow}"></div>
+        <div class="team-head">
+          <div class="team-name-row">
+            ${isLeader ? '<span class="crown">👑</span>' : ''}
+            <input class="team-name" value="${esc(t.name)}" onchange="renameTeam('${t.id}',this.value)"/>
+            <button class="team-x" title="Remove team" onclick="removeTeam('${t.id}')">✕</button>
+          </div>
+        </div>
+        <div class="score-block">
+          <button class="score-btn minus" title="Subtract 1" onclick="bumpTeam('${t.id}',-1)">−</button>
+          <div class="score-num" id="score-${t.id}" style="color:${acc.color}">${fmt(teamTotal(t))}</div>
+          <div class="score-controls">
+            <button class="score-btn plus" title="Add 1 point" onclick="bumpTeam('${t.id}',1)">＋</button>
+            <button class="score-btn" title="Add half point" onclick="bumpTeam('${t.id}',0.5)" style="font-size:0.7rem">+½</button>
+          </div>
+        </div>
+        <div class="players">
+          <div class="players-title">Players</div>
+          ${playerRows}
+          <div class="add-player">
+            <input id="addinput-${t.id}" placeholder="Add player name…"
+                   onkeydown="if(event.key==='Enter'){addPlayer('${t.id}',this)}"/>
+            <button onclick="addPlayer('${t.id}', this.previousElementSibling)">Add</button>
+          </div>
+          <div class="player-sum ${mismatch ? 'mismatch' : ''}">
+            Player points: ${fmt(pTotal)} / Team ${fmt(teamTotal(t))}${mismatch ? ' ⚠' : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  render();
+</script>
+</body>
+</html>
