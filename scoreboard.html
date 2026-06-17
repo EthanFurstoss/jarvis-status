@@ -15,7 +15,7 @@
       background: #070712;
       background-image:
         radial-gradient(ellipse 80% 50% at 20% 20%, #0a1a3a44, transparent),
-        radial-gradient(ellipse 60% 40% at 80% 80%, #0a0a2a44, transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, #2a0a0a44, transparent),
         radial-gradient(ellipse 40% 60% at 60% 10%, #1a0a3a22, transparent);
       color: #f0f0f2;
       font-family: var(--font);
@@ -56,51 +56,45 @@
       font-family: var(--font); transition: all 0.15s;
     }
     .btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
-    .btn.primary { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.35); color: #00d4ff; }
     .btn.danger:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: #f87171; }
 
     /* Teams grid */
-    .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
+    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
     .team-card {
       border-radius: 16px; padding: 0; overflow: hidden;
       display: flex; flex-direction: column; position: relative;
-      transition: transform 0.15s, border-color 0.2s;
+      transition: border-color 0.2s; border-width: 2px;
     }
-    .team-card.leader { border-color: rgba(0,212,255,0.4); box-shadow: 0 0 30px rgba(0,212,255,0.08); }
-    .team-accent { height: 4px; width: 100%; }
+    .team-card.leader { box-shadow: 0 0 30px rgba(255,255,255,0.06); }
 
-    .team-head { padding: 18px 20px 14px; }
-    .team-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    /* Photo banner */
+    .team-photo {
+      position: relative; height: 180px; background-size: cover; background-position: center 25%;
+    }
+    .team-photo-fade {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(7,7,18,0.05) 30%, rgba(7,7,18,0.92) 100%);
+    }
+    .team-accent { position: absolute; top: 0; left: 0; right: 0; height: 5px; z-index: 2; }
+    .team-name-overlay {
+      position: absolute; left: 14px; right: 14px; bottom: 10px; z-index: 2;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .crown { font-size: 1.1rem; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
     .team-name {
-      flex: 1; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.3px;
-      background: transparent; border: none; color: #f0f0f2; font-family: var(--font);
+      flex: 1; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px;
+      background: transparent; border: none; color: #fff; font-family: var(--font);
       border-bottom: 1px solid transparent; padding: 2px 2px; min-width: 0;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
     }
-    .team-name:focus { outline: none; border-bottom-color: rgba(0,212,255,0.4); }
-    .crown { font-size: 1rem; flex-shrink: 0; }
-    .team-x {
-      background: transparent; border: none; color: rgba(255,255,255,0.25);
-      cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 6px; line-height: 1;
-    }
-    .team-x:hover { color: #f87171; background: rgba(239,68,68,0.1); }
-
-    .swatches { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; align-items: center; }
-    .swatch {
-      width: 22px; height: 22px; border-radius: 50%; cursor: pointer; padding: 0;
-      border: 2px solid rgba(255,255,255,0.15); transition: transform 0.12s, border-color 0.12s;
-    }
-    .swatch:hover { transform: scale(1.15); }
-    .swatch.sel { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.4); }
-    .swatch.custom {
-      position: relative; display: inline-flex; align-items: center; justify-content: center;
-      font-size: 0.6rem; border-style: dashed; overflow: hidden;
-    }
-    .swatch.custom input[type=color] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; border: none; padding: 0;
+    .team-name:focus { outline: none; border-bottom-color: rgba(255,255,255,0.5); }
+    .team-tag {
+      font-size: 0.55rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 6px; flex-shrink: 0; z-index: 2;
     }
 
-    .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 20px; }
+    .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 20px 18px; }
     .score-num {
       font-family: var(--mono); font-size: 3.4rem; font-weight: 700; line-height: 1;
       font-variant-numeric: tabular-nums; letter-spacing: -2px;
@@ -128,7 +122,7 @@
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
     .player-row:last-child { border-bottom: none; }
-    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.82); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.82); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); }
     .player-pts {
       font-family: var(--mono); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums;
       min-width: 42px; text-align: right;
@@ -160,14 +154,6 @@
     .player-sum { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-top: 10px; text-align: right; }
     .player-sum.mismatch { color: #f59e0b; }
 
-    .empty {
-      text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3);
-      border-radius: 16px; border: 1px dashed rgba(255,255,255,0.1);
-    }
-    .empty-hint { font-size: 0.8rem; margin-top: 8px; }
-
-    .hint { font-size: 0.62rem; color: rgba(255,255,255,0.2); margin-top: 4px; }
-
     @keyframes breathe { 0%,100%{box-shadow:0 0 10px #00d4ffcc,0 0 20px #00d4ff66} 50%{box-shadow:0 0 20px #00d4ffff,0 0 40px #00d4ffaa} }
     @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
     .pop { animation: pop 0.3s ease; }
@@ -183,16 +169,15 @@
       <div class="brand-dot"></div>
       <div>
         <div class="title">🏆 Century Poker Teams</div>
-        <div class="subtitle">Track teams, players &amp; points — auto-saved</div>
+        <div class="subtitle">Red vs. White — track players &amp; points, auto-saved</div>
       </div>
     </div>
     <a class="back-link" href="/jarvis-status/index.html">← Back to Jarvis</a>
   </header>
 
   <div class="toolbar">
-    <button class="btn primary" onclick="addTeam()">＋ Add Team</button>
     <button class="btn" onclick="resetScores()">↺ Reset Scores</button>
-    <button class="btn danger" onclick="clearAll()">🗑 Clear All</button>
+    <button class="btn danger" onclick="newGame()">🗑 New Game (clear players)</button>
   </div>
 
   <div id="teams" class="teams"></div>
@@ -200,11 +185,14 @@
 </div>
 
 <script>
-  const STORE_KEY = 'jarvis-scoreboard-v1';
-  // Default palette for new teams + the quick-pick swatches.
-  const PRESETS = ['#00d4ff', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c', '#22d3ee'];
+  const STORE_KEY = 'jarvis-scoreboard-v2';
+  // Fixed two-team setup: always a Red team and a White team.
+  const TEAMS = {
+    red:   { color: '#ef4444', photo: 'team-red.jpg',   defaultName: 'Red Team',   tag: 'RED'   },
+    white: { color: '#e5e7eb', photo: 'team-white.jpg', defaultName: 'White Team', tag: 'WHITE' },
+  };
 
-  // Darken a hex color toward black by `amt` (0..1) — used to build accent gradients.
+  // Darken a hex color toward black by `amt` (0..1) — for accent gradients.
   function shade(hex, amt) {
     hex = hex.replace('#', '');
     if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
@@ -214,96 +202,87 @@
     return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
   }
   function glowFor(color) { return `linear-gradient(90deg, ${color}, ${shade(color, 0.35)})`; }
-  // Resolve a team's color, migrating older teams that only stored an `accent` index.
-  function colorOf(t) { return t.color || PRESETS[t.accent] || PRESETS[0]; }
 
   let state = load();
 
+  function defaults() {
+    return { teams: [
+      { key: 'red',   name: TEAMS.red.defaultName,   players: [], score: 0 },
+      { key: 'white', name: TEAMS.white.defaultName, players: [], score: 0 },
+    ]};
+  }
+
   function load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch(e) {}
-    // Seed with two starter teams
-    return {
-      teams: [
-        { id: uid(), name: 'Team 1', color: PRESETS[0], players: [], score: 0 },
-        { id: uid(), name: 'Team 2', color: PRESETS[1], players: [], score: 0 },
-      ]
-    };
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e) {}
+    // Migrate from the old free-form board (v1) if present, mapping by position.
+    if (!raw) {
+      try {
+        const v1 = JSON.parse(localStorage.getItem('jarvis-scoreboard-v1') || 'null');
+        if (v1 && v1.teams) raw = { teams: v1.teams };
+      } catch(e) {}
+    }
+    const base = defaults();
+    if (raw && raw.teams) {
+      ['red','white'].forEach((key, i) => {
+        const prev = raw.teams.find(t => t.key === key) || raw.teams[i];
+        if (prev) {
+          base.teams[i].name = prev.name || base.teams[i].name;
+          base.teams[i].score = prev.score || 0;
+          base.teams[i].players = Array.isArray(prev.players) ? prev.players : [];
+        }
+      });
+    }
+    return base;
   }
 
   function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   function uid() { return Math.random().toString(36).slice(2, 9); }
 
-  // Show whole numbers cleanly, decimals to 1 place (e.g. 3, 3.5)
+  // Whole numbers clean, decimals to 1 place (e.g. 3, 3.5)
   function fmt(n) {
     n = Math.round(n * 10) / 10;
     return Number.isInteger(n) ? String(n) : n.toFixed(1);
   }
 
-  function teamTotal(team) {
-    // The team score is tracked directly so it can differ from / lead the
-    // per-player breakdown, but +1 on a player also bumps the team.
-    return team.score || 0;
-  }
-  function playersTotal(team) {
-    return team.players.reduce((s, p) => s + (p.points || 0), 0);
+  function teamByKey(key) { return state.teams.find(t => t.key === key); }
+  function playersTotal(team) { return team.players.reduce((s, p) => s + (p.points || 0), 0); }
+
+  function renameTeam(key, name) {
+    const t = teamByKey(key);
+    if (t) { t.name = name.trim() || TEAMS[key].defaultName; save(); }
   }
 
-  function addTeam() {
-    const used = state.teams.map(colorOf);
-    const color = PRESETS.find(c => !used.includes(c)) || PRESETS[state.teams.length % PRESETS.length];
-    state.teams.push({ id: uid(), name: 'Team ' + (state.teams.length + 1), color, players: [], score: 0 });
-    save(); render();
-  }
-
-  function changeColor(id, color) {
-    const t = state.teams.find(t => t.id === id);
-    if (t) { t.color = color; save(); render(); }
-  }
-
-  function removeTeam(id) {
-    state.teams = state.teams.filter(t => t.id !== id);
-    save(); render();
-  }
-
-  function renameTeam(id, name) {
-    const t = state.teams.find(t => t.id === id);
-    if (t) { t.name = name; save(); }
-  }
-
-  function bumpTeam(id, delta) {
-    const t = state.teams.find(t => t.id === id);
+  function bumpTeam(key, delta) {
+    const t = teamByKey(key);
     if (!t) return;
     t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10);
     save();
-    const el = document.querySelector(`#score-${id}`);
+    const el = document.querySelector(`#score-${key}`);
     if (el) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
     render();
   }
 
-  function addPlayer(teamId, inputEl) {
+  function addPlayer(key, inputEl) {
     const name = inputEl.value.trim();
     if (!name) return;
-    const t = state.teams.find(t => t.id === teamId);
+    const t = teamByKey(key);
     if (!t) return;
     t.players.push({ id: uid(), name, points: 0 });
     save(); render();
-    // refocus the input for the team after re-render
-    const next = document.querySelector(`#addinput-${teamId}`);
+    const next = document.querySelector(`#addinput-${key}`);
     if (next) next.focus();
   }
 
-  function removePlayer(teamId, pid) {
-    const t = state.teams.find(t => t.id === teamId);
+  function removePlayer(key, pid) {
+    const t = teamByKey(key);
     if (!t) return;
     t.players = t.players.filter(p => p.id !== pid);
     save(); render();
   }
 
-  function bumpPlayer(teamId, pid, delta) {
-    const t = state.teams.find(t => t.id === teamId);
+  function bumpPlayer(key, pid, delta) {
+    const t = teamByKey(key);
     if (!t) return;
     const p = t.players.find(p => p.id === pid);
     if (!p) return;
@@ -313,22 +292,22 @@
     save(); render();
   }
 
-  function renamePlayer(teamId, pid, name) {
-    const t = state.teams.find(t => t.id === teamId);
+  function renamePlayer(key, pid, name) {
+    const t = teamByKey(key);
     if (!t) return;
     const p = t.players.find(p => p.id === pid);
     if (p) { p.name = name; save(); }
   }
 
   function resetScores() {
-    if (!confirm('Reset all team and player scores to 0? (Teams and players are kept.)')) return;
+    if (!confirm('Reset both team and player scores to 0? (Names and players are kept.)')) return;
     state.teams.forEach(t => { t.score = 0; t.players.forEach(p => p.points = 0); });
     save(); render();
   }
 
-  function clearAll() {
-    if (!confirm('Delete ALL teams and players? This cannot be undone.')) return;
-    state = { teams: [] };
+  function newGame() {
+    if (!confirm('Start a new game? This clears all players and scores (team names are kept).')) return;
+    state.teams.forEach(t => { t.score = 0; t.players = []; });
     save(); render();
   }
 
@@ -336,73 +315,61 @@
 
   function render() {
     const root = document.getElementById('teams');
-    if (!state.teams.length) {
-      root.innerHTML = `<div class="empty glass" style="grid-column:1/-1">
-        <div style="font-size:1.6rem">🏆</div>
-        <div class="empty-hint">No teams yet — hit <b>＋ Add Team</b> to start scoring.</div>
-      </div>`;
-      return;
-    }
-
-    const maxScore = Math.max(...state.teams.map(teamTotal));
-    const leaders = maxScore > 0 ? state.teams.filter(t => teamTotal(t) === maxScore).map(t => t.id) : [];
+    const maxScore = Math.max(...state.teams.map(t => t.score || 0));
+    const leaders = maxScore > 0 ? state.teams.filter(t => (t.score || 0) === maxScore).map(t => t.key) : [];
 
     root.innerHTML = state.teams.map(t => {
-      const color = colorOf(t);
+      const cfg = TEAMS[t.key];
+      const color = cfg.color;
       const glow = glowFor(color);
-      const isLeader = leaders.includes(t.id);
+      const isLeader = leaders.includes(t.key) && leaders.length === 1;
       const pTotal = playersTotal(t);
-      const mismatch = Math.round(pTotal * 10) !== Math.round(teamTotal(t) * 10);
+      const mismatch = Math.round(pTotal * 10) !== Math.round((t.score || 0) * 10);
 
       const playerRows = t.players.length ? t.players.map(p => `
         <div class="player-row">
           <input class="player-name" value="${esc(p.name)}"
-                 onchange="renamePlayer('${t.id}','${p.id}',this.value)"
+                 onchange="renamePlayer('${t.key}','${p.id}',this.value)"
                  style="background:transparent;border:none;border-bottom:1px solid transparent"
                  onfocus="this.style.borderBottomColor='rgba(0,212,255,0.4)'"
                  onblur="this.style.borderBottomColor='transparent'"/>
           <span class="player-pts" style="color:${color}">${fmt(p.points)}</span>
-          <button class="pbtn p-half minus" title="Subtract half" onclick="bumpPlayer('${t.id}','${p.id}',-0.5)">−½</button>
-          <button class="pbtn minus" title="Subtract 1" onclick="bumpPlayer('${t.id}','${p.id}',-1)">−</button>
-          <button class="pbtn p-half plus" title="Add half" onclick="bumpPlayer('${t.id}','${p.id}',0.5)">+½</button>
-          <button class="pbtn plus" title="Add 1" onclick="bumpPlayer('${t.id}','${p.id}',1)">＋</button>
-          <button class="pbtn del" title="Remove player" onclick="removePlayer('${t.id}','${p.id}')">✕</button>
+          <button class="pbtn p-half minus" title="Subtract half" onclick="bumpPlayer('${t.key}','${p.id}',-0.5)">−½</button>
+          <button class="pbtn minus" title="Subtract 1" onclick="bumpPlayer('${t.key}','${p.id}',-1)">−</button>
+          <button class="pbtn p-half plus" title="Add half" onclick="bumpPlayer('${t.key}','${p.id}',0.5)">+½</button>
+          <button class="pbtn plus" title="Add 1" onclick="bumpPlayer('${t.key}','${p.id}',1)">＋</button>
+          <button class="pbtn del" title="Remove player" onclick="removePlayer('${t.key}','${p.id}')">✕</button>
         </div>`).join('') : `<div style="font-size:0.74rem;color:rgba(255,255,255,0.25);padding:4px 0">No players yet.</div>`;
 
       return `
-      <div class="team-card glass ${isLeader ? 'leader' : ''}">
-        <div class="team-accent" style="background:${glow}"></div>
-        <div class="team-head">
-          <div class="team-name-row">
+      <div class="team-card glass ${isLeader ? 'leader' : ''}" style="border-color:${color}55">
+        <div class="team-photo" style="background-image:url('${cfg.photo}')">
+          <div class="team-photo-fade"></div>
+          <div class="team-accent" style="background:${glow}"></div>
+          <div class="team-tag" style="position:absolute;top:10px;left:10px;background:${color}dd;color:${t.key==='white'?'#111':'#fff'}">${cfg.tag}</div>
+          <div class="team-name-overlay">
             ${isLeader ? '<span class="crown">👑</span>' : ''}
-            <input class="team-name" value="${esc(t.name)}" onchange="renameTeam('${t.id}',this.value)"/>
-            <button class="team-x" title="Remove team" onclick="removeTeam('${t.id}')">✕</button>
-          </div>
-          <div class="swatches">
-            ${PRESETS.map(c => `<button class="swatch ${c.toLowerCase() === color.toLowerCase() ? 'sel' : ''}" style="background:${c}" title="${c}" onclick="changeColor('${t.id}','${c}')"></button>`).join('')}
-            <label class="swatch custom" title="Custom color" style="background:${color}">
-              🎨<input type="color" value="${color}" oninput="changeColor('${t.id}',this.value)"/>
-            </label>
+            <input class="team-name" value="${esc(t.name)}" onchange="renameTeam('${t.key}',this.value)"/>
           </div>
         </div>
         <div class="score-block">
-          <button class="score-btn minus" title="Subtract 1" onclick="bumpTeam('${t.id}',-1)">−</button>
-          <div class="score-num" id="score-${t.id}" style="color:${color}">${fmt(teamTotal(t))}</div>
+          <button class="score-btn minus" title="Subtract 1" onclick="bumpTeam('${t.key}',-1)">−</button>
+          <div class="score-num" id="score-${t.key}" style="color:${color}">${fmt(t.score || 0)}</div>
           <div class="score-controls">
-            <button class="score-btn plus" title="Add 1 point" onclick="bumpTeam('${t.id}',1)">＋</button>
-            <button class="score-btn" title="Add half point" onclick="bumpTeam('${t.id}',0.5)" style="font-size:0.7rem">+½</button>
+            <button class="score-btn plus" title="Add 1 point" onclick="bumpTeam('${t.key}',1)">＋</button>
+            <button class="score-btn" title="Add half point" onclick="bumpTeam('${t.key}',0.5)" style="font-size:0.7rem">+½</button>
           </div>
         </div>
         <div class="players">
           <div class="players-title">Players</div>
           ${playerRows}
           <div class="add-player">
-            <input id="addinput-${t.id}" placeholder="Add player name…"
-                   onkeydown="if(event.key==='Enter'){addPlayer('${t.id}',this)}"/>
-            <button onclick="addPlayer('${t.id}', this.previousElementSibling)">Add</button>
+            <input id="addinput-${t.key}" placeholder="Add player name…"
+                   onkeydown="if(event.key==='Enter'){addPlayer('${t.key}',this)}"/>
+            <button onclick="addPlayer('${t.key}', this.previousElementSibling)">Add</button>
           </div>
           <div class="player-sum ${mismatch ? 'mismatch' : ''}">
-            Player points: ${fmt(pTotal)} / Team ${fmt(teamTotal(t))}${mismatch ? ' ⚠' : ''}
+            Player points: ${fmt(pTotal)} / Team ${fmt(t.score || 0)}${mismatch ? ' ⚠' : ''}
           </div>
         </div>
       </div>`;
