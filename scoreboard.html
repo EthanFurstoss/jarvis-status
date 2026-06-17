@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Century Poker Teams — Jarvis</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -11,6 +11,7 @@
       --mono: 'JetBrains Mono', monospace;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { max-width: 100%; overflow-x: hidden; }
     body {
       background: #070712;
       background-image:
@@ -20,9 +21,9 @@
       color: #f0f0f2;
       font-family: var(--font);
       min-height: 100vh;
-      padding: 28px 20px 60px;
+      padding: 18px 14px 50px;
     }
-    .wrap { max-width: 1000px; margin: 0 auto; }
+    .wrap { max-width: 1100px; margin: 0 auto; }
 
     .glass {
       background: rgba(255,255,255,0.03);
@@ -33,70 +34,75 @@
 
     /* Header */
     header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 22px; border-radius: 14px; margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 12px 18px; border-radius: 14px; margin-bottom: 12px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
     .brand-dot {
-      width: 9px; height: 9px; border-radius: 50%; background: #00d4ff;
+      width: 9px; height: 9px; border-radius: 50%; background: #00d4ff; flex-shrink: 0;
       box-shadow: 0 0 12px #00d4ffcc, 0 0 24px #00d4ff66;
       animation: breathe 2.5s ease-in-out infinite;
     }
-    .title { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.5px; }
-    .subtitle { font-size: 0.68rem; color: rgba(255,255,255,0.32); margin-top: 1px; }
-    .back-link { font-size: 0.7rem; color: rgba(255,255,255,0.35); text-decoration: none; }
-    .back-link:hover { color: #00d4ff; }
+    .title { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { font-size: 0.66rem; color: rgba(255,255,255,0.32); margin-top: 1px; }
+    .back-link { font-size: 0.7rem; color: rgba(255,255,255,0.35); text-decoration: none; flex-shrink: 0; }
 
-    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .btn {
-      display: inline-flex; align-items: center; gap: 7px;
+      display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.78); font-size: 0.78rem; font-weight: 600;
-      padding: 9px 15px; border-radius: 9px; cursor: pointer;
+      color: rgba(255,255,255,0.78); font-size: 0.74rem; font-weight: 600;
+      padding: 8px 13px; border-radius: 9px; cursor: pointer;
       font-family: var(--font); transition: all 0.15s;
     }
-    .btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
-    .btn.danger:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: #f87171; }
 
-    /* Teams grid */
-    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    /* Teams grid — auto 1 col (portrait phone) → 2 cols when there's room (landscape/desktop) */
+    .teams { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 14px; }
 
     .team-card {
       border-radius: 16px; padding: 0; overflow: hidden;
-      display: flex; flex-direction: column; position: relative;
-      transition: border-color 0.2s; border-width: 2px;
+      display: flex; flex-direction: column; position: relative; border-width: 2px;
     }
-    .team-card.leader { box-shadow: 0 0 30px rgba(255,255,255,0.06); }
 
-    /* Photo banner */
-    .team-photo {
-      position: relative; height: 180px; background-size: cover; background-position: center 25%;
+    /* Photo banner — full image visible (contain) over a blurred fill of the same image */
+    .team-photo { position: relative; height: 260px; overflow: hidden; background: #05050c; }
+    .photo-bg {
+      position: absolute; inset: -10%; background-size: cover; background-position: center;
+      filter: blur(22px) brightness(0.45); transform: scale(1.15); transition: opacity 0.4s;
+    }
+    .photo-img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+      transition: opacity 0.4s; z-index: 1;
     }
     .team-photo-fade {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(7,7,18,0.05) 30%, rgba(7,7,18,0.92) 100%);
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(7,7,18,0) 45%, rgba(7,7,18,0.9) 100%);
     }
-    .team-accent { position: absolute; top: 0; left: 0; right: 0; height: 5px; z-index: 2; }
+    .team-accent { position: absolute; top: 0; left: 0; right: 0; height: 5px; z-index: 3; }
+    .photo-dots { position: absolute; bottom: 8px; left: 0; right: 0; z-index: 3; display: flex; gap: 5px; justify-content: center; }
+    .photo-dots span { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.35); transition: all 0.3s; }
+    .photo-dots span.on { background: #fff; width: 14px; border-radius: 3px; }
+    .team-tag {
+      position: absolute; top: 10px; left: 10px; z-index: 3;
+      font-size: 0.55rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 6px;
+    }
     .team-name-overlay {
-      position: absolute; left: 14px; right: 14px; bottom: 10px; z-index: 2;
+      position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 3;
       display: flex; align-items: center; gap: 8px;
     }
-    .crown { font-size: 1.1rem; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); }
+    .crown { font-size: 1.1rem; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.9)); }
     .team-name {
       flex: 1; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px;
       background: transparent; border: none; color: #fff; font-family: var(--font);
       border-bottom: 1px solid transparent; padding: 2px 2px; min-width: 0;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.95);
     }
     .team-name:focus { outline: none; border-bottom-color: rgba(255,255,255,0.5); }
-    .team-tag {
-      font-size: 0.55rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
-      padding: 3px 8px; border-radius: 6px; flex-shrink: 0; z-index: 2;
-    }
 
-    .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 20px 18px; }
+    .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 14px 18px 16px; }
     .score-num {
-      font-family: var(--mono); font-size: 3.4rem; font-weight: 700; line-height: 1;
+      font-family: var(--mono); font-size: 3.2rem; font-weight: 700; line-height: 1;
       font-variant-numeric: tabular-nums; letter-spacing: -2px;
     }
     .score-controls { display: flex; flex-direction: column; gap: 8px; }
@@ -104,61 +110,91 @@
       width: 46px; height: 38px; border-radius: 10px; cursor: pointer;
       font-size: 1.3rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
       border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f0f0f2;
-      transition: all 0.12s; user-select: none;
+      transition: transform 0.08s; user-select: none; -webkit-tap-highlight-color: transparent;
     }
     .score-btn.plus { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.3); color: #34d399; font-size: 1.5rem; height: 56px; }
-    .score-btn.plus:hover { background: rgba(52,211,153,0.22); transform: scale(1.05); }
-    .score-btn.plus:active { transform: scale(0.94); }
-    .score-btn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+    .score-btn.plus:active { transform: scale(0.92); }
+    .score-btn.minus:active { transform: scale(0.92); }
 
     /* Players */
-    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 14px 20px 18px; }
+    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 13px 16px 16px; }
     .players-title {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
-      color: rgba(255,255,255,0.22); margin-bottom: 10px;
+      color: rgba(255,255,255,0.22); margin-bottom: 9px;
     }
     .player-row {
-      display: flex; align-items: center; gap: 8px; padding: 7px 0;
+      display: flex; align-items: center; gap: 6px; padding: 7px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04);
     }
     .player-row:last-child { border-bottom: none; }
-    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.82); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); }
+    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.85); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); }
     .player-pts {
       font-family: var(--mono); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums;
-      min-width: 42px; text-align: right;
+      min-width: 38px; text-align: right;
     }
     .pbtn {
-      width: 26px; height: 26px; border-radius: 7px; cursor: pointer; flex-shrink: 0;
+      width: 26px; height: 28px; border-radius: 7px; cursor: pointer; flex-shrink: 0;
       font-size: 0.78rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
       border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
-      transition: all 0.12s; user-select: none;
+      transition: transform 0.08s; user-select: none; -webkit-tap-highlight-color: transparent;
     }
-    .pbtn.p-half { font-size: 0.6rem; width: 30px; }
-    .pbtn.plus:hover { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.35); color: #34d399; }
-    .pbtn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
-    .pbtn.del:hover { background: rgba(239,68,68,0.12); color: #f87171; }
+    .pbtn:active { transform: scale(0.9); }
+    .pbtn.p-half { font-size: 0.58rem; width: 28px; }
 
-    .add-player { display: flex; gap: 8px; margin-top: 12px; }
+    /* Quick-add chips from saved roster */
+    .roster-label { font-size: 0.58rem; color: rgba(255,255,255,0.3); margin: 10px 0 6px; letter-spacing: 0.5px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(0,212,255,0.07); border: 1px solid rgba(0,212,255,0.2); color: #9fe6ff;
+      font-size: 0.72rem; font-weight: 600; padding: 5px 10px; border-radius: 20px; cursor: pointer;
+      font-family: var(--font); -webkit-tap-highlight-color: transparent;
+    }
+    .chip:active { transform: scale(0.94); }
+    .chip .x { color: rgba(255,255,255,0.3); font-size: 0.7rem; padding-left: 2px; }
+
+    .add-player { display: flex; gap: 8px; margin-top: 10px; }
     .add-player input {
       flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 8px 11px; color: #f0f0f2; font-size: 0.78rem; font-family: var(--font);
+      border-radius: 8px; padding: 8px 11px; color: #f0f0f2; font-size: 0.82rem; font-family: var(--font); min-width: 0;
     }
     .add-player input:focus { outline: none; border-color: rgba(0,212,255,0.4); }
     .add-player button {
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; color: rgba(255,255,255,0.7); cursor: pointer; padding: 0 13px;
-      font-size: 0.78rem; font-weight: 600; transition: all 0.12s;
+      border-radius: 8px; color: rgba(255,255,255,0.7); cursor: pointer; padding: 0 14px;
+      font-size: 0.78rem; font-weight: 600; -webkit-tap-highlight-color: transparent;
     }
-    .add-player button:hover { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
-
-    .player-sum { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-top: 10px; text-align: right; }
+    .player-sum { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-top: 9px; text-align: right; }
     .player-sum.mismatch { color: #f59e0b; }
 
+    button:focus { outline: none; }
+
+    /* Hover styles ONLY on devices with a real pointer — prevents the last-tapped
+       button staying highlighted on touchscreens. */
+    @media (hover: hover) and (pointer: fine) {
+      .btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
+      .btn.danger:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); color: #f87171; }
+      .score-btn.plus:hover { background: rgba(52,211,153,0.22); transform: scale(1.05); }
+      .score-btn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+      .pbtn.plus:hover { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.35); color: #34d399; }
+      .pbtn.minus:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+      .pbtn.del:hover { background: rgba(239,68,68,0.12); color: #f87171; }
+      .chip:hover { background: rgba(0,212,255,0.14); border-color: rgba(0,212,255,0.35); }
+      .add-player button:hover { background: rgba(0,212,255,0.12); border-color: rgba(0,212,255,0.3); color: #00d4ff; }
+    }
+
     @keyframes breathe { 0%,100%{box-shadow:0 0 10px #00d4ffcc,0 0 20px #00d4ff66} 50%{box-shadow:0 0 20px #00d4ffff,0 0 40px #00d4ffaa} }
-    @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
+    @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.16)} 100%{transform:scale(1)} }
     .pop { animation: pop 0.3s ease; }
 
-    @media(max-width:560px){ .teams { grid-template-columns: 1fr; } }
+    /* Landscape on a phone: keep two columns, shrink the photo & score so a card fits the short height */
+    @media (orientation: landscape) and (max-height: 600px) {
+      body { padding: 10px 12px 30px; }
+      .teams { grid-template-columns: 1fr 1fr; }
+      .team-photo { height: 150px; }
+      .score-num { font-size: 2.4rem; }
+      header { margin-bottom: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -169,15 +205,15 @@
       <div class="brand-dot"></div>
       <div>
         <div class="title">🏆 Century Poker Teams</div>
-        <div class="subtitle">Red vs. White — track players &amp; points, auto-saved</div>
+        <div class="subtitle">Red vs. White — auto-saved</div>
       </div>
     </div>
-    <a class="back-link" href="/jarvis-status/index.html">← Back to Jarvis</a>
+    <a class="back-link" href="/jarvis-status/index.html">← Jarvis</a>
   </header>
 
   <div class="toolbar">
     <button class="btn" onclick="resetScores()">↺ Reset Scores</button>
-    <button class="btn danger" onclick="newGame()">🗑 New Game (clear players)</button>
+    <button class="btn danger" onclick="newGame()">🗑 New Game</button>
   </div>
 
   <div id="teams" class="teams"></div>
@@ -186,13 +222,18 @@
 
 <script>
   const STORE_KEY = 'jarvis-scoreboard-v2';
+  const ROSTER_KEY = 'jarvis-roster-v1';
+  const CONFIG_URL = 'config.json';
+
   // Fixed two-team setup: always a Red team and a White team.
   const TEAMS = {
-    red:   { color: '#ef4444', photo: 'team-red.jpg',   defaultName: 'Red Team',   tag: 'RED'   },
-    white: { color: '#e5e7eb', photo: 'team-white.jpg', defaultName: 'White Team', tag: 'WHITE' },
+    red:   { color: '#ef4444', defaultName: 'Red Team',   tag: 'RED'   },
+    white: { color: '#e5e7eb', defaultName: 'White Team', tag: 'WHITE' },
   };
+  // Photo collections per team (cross-faded). Overridden by config.json if present.
+  let PHOTOS = { red: ['team-red.jpg'], white: ['team-white.jpg'] };
+  const photoIdx = { red: 0, white: 0 };
 
-  // Darken a hex color toward black by `amt` (0..1) — for accent gradients.
   function shade(hex, amt) {
     hex = hex.replace('#', '');
     if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
@@ -205,23 +246,17 @@
 
   let state = load();
 
+  /* ---------- persistence ---------- */
   function defaults() {
     return { teams: [
       { key: 'red',   name: TEAMS.red.defaultName,   players: [], score: 0 },
       { key: 'white', name: TEAMS.white.defaultName, players: [], score: 0 },
     ]};
   }
-
   function load() {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch(e) {}
-    // Migrate from the old free-form board (v1) if present, mapping by position.
-    if (!raw) {
-      try {
-        const v1 = JSON.parse(localStorage.getItem('jarvis-scoreboard-v1') || 'null');
-        if (v1 && v1.teams) raw = { teams: v1.teams };
-      } catch(e) {}
-    }
+    if (!raw) { try { const v1 = JSON.parse(localStorage.getItem('jarvis-scoreboard-v1') || 'null'); if (v1 && v1.teams) raw = { teams: v1.teams }; } catch(e) {} }
     const base = defaults();
     if (raw && raw.teams) {
       ['red','white'].forEach((key, i) => {
@@ -235,27 +270,32 @@
     }
     return base;
   }
-
   function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   function uid() { return Math.random().toString(36).slice(2, 9); }
 
-  // Whole numbers clean, decimals to 1 place (e.g. 3, 3.5)
-  function fmt(n) {
-    n = Math.round(n * 10) / 10;
-    return Number.isInteger(n) ? String(n) : n.toFixed(1);
+  /* ---------- roster (saved player names) ---------- */
+  function getRoster() { try { return JSON.parse(localStorage.getItem(ROSTER_KEY) || '[]'); } catch(e) { return []; } }
+  function saveRoster(a) { localStorage.setItem(ROSTER_KEY, JSON.stringify(a)); }
+  function mergeRoster(names) {
+    const s = getRoster();
+    names.forEach(n => { n = (n || '').trim(); if (n && !s.some(x => x.toLowerCase() === n.toLowerCase())) s.push(n); });
+    s.sort((a, b) => a.localeCompare(b));
+    saveRoster(s);
   }
+  function forgetName(name) { saveRoster(getRoster().filter(n => n.toLowerCase() !== name.toLowerCase())); render(); }
+  function forgetEnc(enc) { forgetName(decodeURIComponent(enc)); }
 
+  /* ---------- helpers ---------- */
+  function fmt(n) { n = Math.round(n * 10) / 10; return Number.isInteger(n) ? String(n) : n.toFixed(1); }
   function teamByKey(key) { return state.teams.find(t => t.key === key); }
   function playersTotal(team) { return team.players.reduce((s, p) => s + (p.points || 0), 0); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-  function renameTeam(key, name) {
-    const t = teamByKey(key);
-    if (t) { t.name = name.trim() || TEAMS[key].defaultName; save(); }
-  }
+  /* ---------- actions ---------- */
+  function renameTeam(key, name) { const t = teamByKey(key); if (t) { t.name = name.trim() || TEAMS[key].defaultName; save(); } }
 
   function bumpTeam(key, delta) {
-    const t = teamByKey(key);
-    if (!t) return;
+    const t = teamByKey(key); if (!t) return;
     t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10);
     save();
     const el = document.querySelector(`#score-${key}`);
@@ -263,40 +303,35 @@
     render();
   }
 
-  function addPlayer(key, inputEl) {
-    const name = inputEl.value.trim();
-    if (!name) return;
-    const t = teamByKey(key);
-    if (!t) return;
+  function addPlayerName(key, name) {
+    name = (name || '').trim(); if (!name) return;
+    const t = teamByKey(key); if (!t) return;
     t.players.push({ id: uid(), name, points: 0 });
+    mergeRoster([name]);
     save(); render();
-    const next = document.querySelector(`#addinput-${key}`);
-    if (next) next.focus();
   }
+  function addPlayer(key, inputEl) {
+    addPlayerName(key, inputEl.value);
+    const next = document.querySelector(`#addinput-${key}`);
+    if (next) { next.value = ''; next.focus(); }
+  }
+  function quickAdd(key, enc) { addPlayerName(key, decodeURIComponent(enc)); }
 
   function removePlayer(key, pid) {
-    const t = teamByKey(key);
-    if (!t) return;
+    const t = teamByKey(key); if (!t) return;
     t.players = t.players.filter(p => p.id !== pid);
     save(); render();
   }
-
   function bumpPlayer(key, pid, delta) {
-    const t = teamByKey(key);
-    if (!t) return;
-    const p = t.players.find(p => p.id === pid);
-    if (!p) return;
+    const t = teamByKey(key); if (!t) return;
+    const p = t.players.find(p => p.id === pid); if (!p) return;
     p.points = Math.max(0, Math.round((p.points + delta) * 10) / 10);
-    // A point scored by a player also counts toward the team score.
-    t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10);
+    t.score = Math.max(0, Math.round(((t.score || 0) + delta) * 10) / 10); // player point also scores for team
     save(); render();
   }
-
   function renamePlayer(key, pid, name) {
-    const t = teamByKey(key);
-    if (!t) return;
-    const p = t.players.find(p => p.id === pid);
-    if (p) { p.name = name; save(); }
+    const t = teamByKey(key); if (!t) return;
+    const p = t.players.find(p => p.id === pid); if (p) { p.name = name; mergeRoster([name]); save(); }
   }
 
   function resetScores() {
@@ -304,19 +339,42 @@
     state.teams.forEach(t => { t.score = 0; t.players.forEach(p => p.points = 0); });
     save(); render();
   }
-
   function newGame() {
-    if (!confirm('Start a new game? This clears all players and scores (team names are kept).')) return;
+    if (!confirm('Start a new game? Clears players and scores (saved names are kept for quick-add).')) return;
     state.teams.forEach(t => { t.score = 0; t.players = []; });
     save(); render();
   }
 
-  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  /* ---------- photo carousel ---------- */
+  function swapPhoto(key, src) {
+    const img = document.getElementById('photo-img-' + key);
+    const bg = document.getElementById('photo-bg-' + key);
+    if (!img) return;
+    img.style.opacity = 0; if (bg) bg.style.opacity = 0;
+    setTimeout(() => {
+      img.src = src; if (bg) bg.style.backgroundImage = `url('${src}')`;
+      img.style.opacity = 1; if (bg) bg.style.opacity = 1;
+      const dots = document.getElementById('dots-' + key);
+      if (dots) [...dots.children].forEach((d, i) => d.classList.toggle('on', i === photoIdx[key]));
+    }, 380);
+  }
+  function startCarousel() {
+    setInterval(() => {
+      ['red', 'white'].forEach(key => {
+        const arr = PHOTOS[key] || [];
+        if (arr.length < 2) return;
+        photoIdx[key] = (photoIdx[key] + 1) % arr.length;
+        swapPhoto(key, arr[photoIdx[key]]);
+      });
+    }, 5000);
+  }
 
+  /* ---------- render ---------- */
   function render() {
     const root = document.getElementById('teams');
     const maxScore = Math.max(...state.teams.map(t => t.score || 0));
     const leaders = maxScore > 0 ? state.teams.filter(t => (t.score || 0) === maxScore).map(t => t.key) : [];
+    const roster = getRoster();
 
     root.innerHTML = state.teams.map(t => {
       const cfg = TEAMS[t.key];
@@ -325,6 +383,9 @@
       const isLeader = leaders.includes(t.key) && leaders.length === 1;
       const pTotal = playersTotal(t);
       const mismatch = Math.round(pTotal * 10) !== Math.round((t.score || 0) * 10);
+      const photos = PHOTOS[t.key] || [];
+      if (photoIdx[t.key] >= photos.length) photoIdx[t.key] = 0;
+      const curPhoto = photos[photoIdx[t.key]] || '';
 
       const playerRows = t.players.length ? t.players.map(p => `
         <div class="player-row">
@@ -334,19 +395,32 @@
                  onfocus="this.style.borderBottomColor='rgba(0,212,255,0.4)'"
                  onblur="this.style.borderBottomColor='transparent'"/>
           <span class="player-pts" style="color:${color}">${fmt(p.points)}</span>
-          <button class="pbtn p-half minus" title="Subtract half" onclick="bumpPlayer('${t.key}','${p.id}',-0.5)">−½</button>
+          <button class="pbtn p-half" title="Subtract half" onclick="bumpPlayer('${t.key}','${p.id}',-0.5)">−½</button>
           <button class="pbtn minus" title="Subtract 1" onclick="bumpPlayer('${t.key}','${p.id}',-1)">−</button>
           <button class="pbtn p-half plus" title="Add half" onclick="bumpPlayer('${t.key}','${p.id}',0.5)">+½</button>
           <button class="pbtn plus" title="Add 1" onclick="bumpPlayer('${t.key}','${p.id}',1)">＋</button>
           <button class="pbtn del" title="Remove player" onclick="removePlayer('${t.key}','${p.id}')">✕</button>
         </div>`).join('') : `<div style="font-size:0.74rem;color:rgba(255,255,255,0.25);padding:4px 0">No players yet.</div>`;
 
+      const onTeam = new Set(t.players.map(p => p.name.toLowerCase()));
+      const suggestions = roster.filter(n => !onTeam.has(n.toLowerCase()));
+      const chips = suggestions.length ? `
+        <div class="roster-label">Quick add from saved players</div>
+        <div class="chips">
+          ${suggestions.map(n => `<button class="chip" onclick="quickAdd('${t.key}','${encodeURIComponent(n)}')">+ ${esc(n)}<span class="x" title="Forget this name" onclick="event.stopPropagation();forgetEnc('${encodeURIComponent(n)}')">✕</span></button>`).join('')}
+        </div>` : '';
+
+      const dots = photos.length > 1 ? `<div class="photo-dots" id="dots-${t.key}">${photos.map((_, i) => `<span class="${i === photoIdx[t.key] ? 'on' : ''}"></span>`).join('')}</div>` : '';
+
       return `
       <div class="team-card glass ${isLeader ? 'leader' : ''}" style="border-color:${color}55">
-        <div class="team-photo" style="background-image:url('${cfg.photo}')">
+        <div class="team-photo">
+          <div class="photo-bg" id="photo-bg-${t.key}" style="background-image:url('${curPhoto}')"></div>
+          <img class="photo-img" id="photo-img-${t.key}" src="${curPhoto}" alt="${esc(t.name)} photo"/>
           <div class="team-photo-fade"></div>
           <div class="team-accent" style="background:${glow}"></div>
-          <div class="team-tag" style="position:absolute;top:10px;left:10px;background:${color}dd;color:${t.key==='white'?'#111':'#fff'}">${cfg.tag}</div>
+          <div class="team-tag" style="background:${color}dd;color:${t.key==='white'?'#111':'#fff'}">${cfg.tag}</div>
+          ${dots}
           <div class="team-name-overlay">
             ${isLeader ? '<span class="crown">👑</span>' : ''}
             <input class="team-name" value="${esc(t.name)}" onchange="renameTeam('${t.key}',this.value)"/>
@@ -363,10 +437,12 @@
         <div class="players">
           <div class="players-title">Players</div>
           ${playerRows}
+          ${chips}
           <div class="add-player">
-            <input id="addinput-${t.key}" placeholder="Add player name…"
+            <input id="addinput-${t.key}" list="rl-${t.key}" placeholder="Add player name…"
                    onkeydown="if(event.key==='Enter'){addPlayer('${t.key}',this)}"/>
-            <button onclick="addPlayer('${t.key}', this.previousElementSibling)">Add</button>
+            <datalist id="rl-${t.key}">${roster.map(n => `<option value="${esc(n)}">`).join('')}</datalist>
+            <button onclick="addPlayer('${t.key}', this.previousElementSibling.previousElementSibling)">Add</button>
           </div>
           <div class="player-sum ${mismatch ? 'mismatch' : ''}">
             Player points: ${fmt(pTotal)} / Team ${fmt(t.score || 0)}${mismatch ? ' ⚠' : ''}
@@ -376,7 +452,22 @@
     }).join('');
   }
 
+  /* ---------- boot ---------- */
+  async function loadConfig() {
+    try {
+      const r = await fetch(CONFIG_URL + '?t=' + Date.now());
+      if (r.ok) {
+        const c = await r.json();
+        if (c.photos) { if (Array.isArray(c.photos.red)) PHOTOS.red = c.photos.red; if (Array.isArray(c.photos.white)) PHOTOS.white = c.photos.white; }
+        if (Array.isArray(c.roster)) mergeRoster(c.roster);
+      }
+    } catch(e) { /* offline / file:// — defaults are fine */ }
+    render();
+  }
+
   render();
+  loadConfig();
+  startCarousel();
 </script>
 </body>
 </html>
