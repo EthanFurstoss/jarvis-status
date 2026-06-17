@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scoreboard — Jarvis</title>
+  <title>Century Poker Teams — Jarvis</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -84,6 +84,21 @@
       cursor: pointer; font-size: 1rem; padding: 2px 6px; border-radius: 6px; line-height: 1;
     }
     .team-x:hover { color: #f87171; background: rgba(239,68,68,0.1); }
+
+    .swatches { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; align-items: center; }
+    .swatch {
+      width: 22px; height: 22px; border-radius: 50%; cursor: pointer; padding: 0;
+      border: 2px solid rgba(255,255,255,0.15); transition: transform 0.12s, border-color 0.12s;
+    }
+    .swatch:hover { transform: scale(1.15); }
+    .swatch.sel { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.4); }
+    .swatch.custom {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; border-style: dashed; overflow: hidden;
+    }
+    .swatch.custom input[type=color] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; border: none; padding: 0;
+    }
 
     .score-block { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 20px; }
     .score-num {
@@ -167,7 +182,7 @@
     <div class="brand">
       <div class="brand-dot"></div>
       <div>
-        <div class="title">🏆 Scoreboard</div>
+        <div class="title">🏆 Century Poker Teams</div>
         <div class="subtitle">Track teams, players &amp; points — auto-saved</div>
       </div>
     </div>
@@ -186,14 +201,21 @@
 
 <script>
   const STORE_KEY = 'jarvis-scoreboard-v1';
-  const ACCENTS = [
-    { color: '#00d4ff', glow: 'linear-gradient(90deg,#00d4ff,#0066ff)' },
-    { color: '#f87171', glow: 'linear-gradient(90deg,#f87171,#ef4444)' },
-    { color: '#34d399', glow: 'linear-gradient(90deg,#34d399,#10b981)' },
-    { color: '#fbbf24', glow: 'linear-gradient(90deg,#fbbf24,#f59e0b)' },
-    { color: '#a78bfa', glow: 'linear-gradient(90deg,#a78bfa,#8b5cf6)' },
-    { color: '#f472b6', glow: 'linear-gradient(90deg,#f472b6,#ec4899)' },
-  ];
+  // Default palette for new teams + the quick-pick swatches.
+  const PRESETS = ['#00d4ff', '#f87171', '#34d399', '#fbbf24', '#a78bfa', '#f472b6', '#fb923c', '#22d3ee'];
+
+  // Darken a hex color toward black by `amt` (0..1) — used to build accent gradients.
+  function shade(hex, amt) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    r = Math.round(r * (1 - amt)); g = Math.round(g * (1 - amt)); b = Math.round(b * (1 - amt));
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  }
+  function glowFor(color) { return `linear-gradient(90deg, ${color}, ${shade(color, 0.35)})`; }
+  // Resolve a team's color, migrating older teams that only stored an `accent` index.
+  function colorOf(t) { return t.color || PRESETS[t.accent] || PRESETS[0]; }
 
   let state = load();
 
@@ -205,8 +227,8 @@
     // Seed with two starter teams
     return {
       teams: [
-        { id: uid(), name: 'Team 1', accent: 0, players: [] },
-        { id: uid(), name: 'Team 2', accent: 1, players: [] },
+        { id: uid(), name: 'Team 1', color: PRESETS[0], players: [], score: 0 },
+        { id: uid(), name: 'Team 2', color: PRESETS[1], players: [], score: 0 },
       ]
     };
   }
@@ -230,11 +252,15 @@
   }
 
   function addTeam() {
-    const used = state.teams.map(t => t.accent);
-    let accent = ACCENTS.findIndex((_, i) => !used.includes(i));
-    if (accent === -1) accent = state.teams.length % ACCENTS.length;
-    state.teams.push({ id: uid(), name: 'Team ' + (state.teams.length + 1), accent, players: [], score: 0 });
+    const used = state.teams.map(colorOf);
+    const color = PRESETS.find(c => !used.includes(c)) || PRESETS[state.teams.length % PRESETS.length];
+    state.teams.push({ id: uid(), name: 'Team ' + (state.teams.length + 1), color, players: [], score: 0 });
     save(); render();
+  }
+
+  function changeColor(id, color) {
+    const t = state.teams.find(t => t.id === id);
+    if (t) { t.color = color; save(); render(); }
   }
 
   function removeTeam(id) {
@@ -322,7 +348,8 @@
     const leaders = maxScore > 0 ? state.teams.filter(t => teamTotal(t) === maxScore).map(t => t.id) : [];
 
     root.innerHTML = state.teams.map(t => {
-      const acc = ACCENTS[t.accent % ACCENTS.length];
+      const color = colorOf(t);
+      const glow = glowFor(color);
       const isLeader = leaders.includes(t.id);
       const pTotal = playersTotal(t);
       const mismatch = Math.round(pTotal * 10) !== Math.round(teamTotal(t) * 10);
@@ -334,7 +361,7 @@
                  style="background:transparent;border:none;border-bottom:1px solid transparent"
                  onfocus="this.style.borderBottomColor='rgba(0,212,255,0.4)'"
                  onblur="this.style.borderBottomColor='transparent'"/>
-          <span class="player-pts" style="color:${acc.color}">${fmt(p.points)}</span>
+          <span class="player-pts" style="color:${color}">${fmt(p.points)}</span>
           <button class="pbtn p-half minus" title="Subtract half" onclick="bumpPlayer('${t.id}','${p.id}',-0.5)">−½</button>
           <button class="pbtn minus" title="Subtract 1" onclick="bumpPlayer('${t.id}','${p.id}',-1)">−</button>
           <button class="pbtn p-half plus" title="Add half" onclick="bumpPlayer('${t.id}','${p.id}',0.5)">+½</button>
@@ -344,17 +371,23 @@
 
       return `
       <div class="team-card glass ${isLeader ? 'leader' : ''}">
-        <div class="team-accent" style="background:${acc.glow}"></div>
+        <div class="team-accent" style="background:${glow}"></div>
         <div class="team-head">
           <div class="team-name-row">
             ${isLeader ? '<span class="crown">👑</span>' : ''}
             <input class="team-name" value="${esc(t.name)}" onchange="renameTeam('${t.id}',this.value)"/>
             <button class="team-x" title="Remove team" onclick="removeTeam('${t.id}')">✕</button>
           </div>
+          <div class="swatches">
+            ${PRESETS.map(c => `<button class="swatch ${c.toLowerCase() === color.toLowerCase() ? 'sel' : ''}" style="background:${c}" title="${c}" onclick="changeColor('${t.id}','${c}')"></button>`).join('')}
+            <label class="swatch custom" title="Custom color" style="background:${color}">
+              🎨<input type="color" value="${color}" oninput="changeColor('${t.id}',this.value)"/>
+            </label>
+          </div>
         </div>
         <div class="score-block">
           <button class="score-btn minus" title="Subtract 1" onclick="bumpTeam('${t.id}',-1)">−</button>
-          <div class="score-num" id="score-${t.id}" style="color:${acc.color}">${fmt(teamTotal(t))}</div>
+          <div class="score-num" id="score-${t.id}" style="color:${color}">${fmt(teamTotal(t))}</div>
           <div class="score-controls">
             <button class="score-btn plus" title="Add 1 point" onclick="bumpTeam('${t.id}',1)">＋</button>
             <button class="score-btn" title="Add half point" onclick="bumpTeam('${t.id}',0.5)" style="font-size:0.7rem">+½</button>
