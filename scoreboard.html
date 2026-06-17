@@ -169,6 +169,24 @@
 
     button:focus { outline: none; }
 
+    /* Player Bank manager */
+    .bank { border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+    .bank-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .bank-add-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .bank-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .bank-row:last-of-type { border-bottom: none; }
+    .bank-name, .bank-add-row input {
+      flex: 1; background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 8px 11px; color: #f0f0f2; font-size: 0.82rem; font-family: var(--font); min-width: 0;
+    }
+    .bank-name:focus, .bank-add-row input:focus { outline: none; border-color: rgba(0,212,255,0.4); }
+    .bank-add-row button {
+      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: #00d4ff;
+      border-radius: 8px; cursor: pointer; padding: 0 16px; font-size: 0.78rem; font-weight: 700;
+      font-family: var(--font); -webkit-tap-highlight-color: transparent;
+    }
+    .bank-note { font-size: 0.6rem; color: rgba(255,255,255,0.25); margin-top: 10px; line-height: 1.5; }
+
     /* Hover styles ONLY on devices with a real pointer — prevents the last-tapped
        button staying highlighted on touchscreens. */
     @media (hover: hover) and (pointer: fine) {
@@ -212,9 +230,12 @@
   </header>
 
   <div class="toolbar">
+    <button class="btn" onclick="toggleBank()">👥 Player Bank</button>
     <button class="btn" onclick="resetScores()">↺ Reset Scores</button>
     <button class="btn danger" onclick="newGame()">🗑 New Game</button>
   </div>
+
+  <div id="bank-panel"></div>
 
   <div id="teams" class="teams"></div>
 
@@ -284,6 +305,58 @@
   }
   function forgetName(name) { saveRoster(getRoster().filter(n => n.toLowerCase() !== name.toLowerCase())); render(); }
   function forgetEnc(enc) { forgetName(decodeURIComponent(enc)); }
+
+  /* ---------- player bank manager ---------- */
+  let bankOpen = false;
+  function toggleBank() { bankOpen = !bankOpen; renderBank(); }
+  function bankAdd(input) {
+    const name = (input.value || '').trim();
+    if (!name) return;
+    mergeRoster([name]);
+    input.value = '';
+    renderBank();
+    const el = document.getElementById('bank-add'); if (el) el.focus();
+    render(); // refresh team quick-add chips
+  }
+  function bankRename(enc, newName) {
+    const oldName = decodeURIComponent(enc);
+    newName = (newName || '').trim();
+    let roster = getRoster();
+    const idx = roster.findIndex(n => n.toLowerCase() === oldName.toLowerCase());
+    if (idx === -1) return;
+    if (!newName) { return renderBank(); }            // ignore blank edits
+    const dupe = roster.findIndex((n, i) => i !== idx && n.toLowerCase() === newName.toLowerCase());
+    if (dupe !== -1) roster.splice(idx, 1);           // merge into existing entry
+    else roster[idx] = newName;
+    roster.sort((a, b) => a.localeCompare(b));
+    saveRoster(roster);
+    // Keep current-game players in sync with the renamed bank entry.
+    state.teams.forEach(t => t.players.forEach(p => { if (p.name.toLowerCase() === oldName.toLowerCase()) p.name = newName; }));
+    save(); renderBank(); render();
+  }
+  function renderBank() {
+    const panel = document.getElementById('bank-panel');
+    if (!panel) return;
+    if (!bankOpen) { panel.innerHTML = ''; return; }
+    const roster = getRoster();
+    panel.innerHTML = `
+      <div class="bank glass">
+        <div class="bank-head">
+          <div class="players-title" style="margin:0">Player Bank — ${roster.length} saved</div>
+          <button class="btn" onclick="toggleBank()" style="padding:6px 12px">Done</button>
+        </div>
+        <div class="bank-add-row">
+          <input id="bank-add" placeholder="Add a player to the bank…" onkeydown="if(event.key==='Enter')bankAdd(this)"/>
+          <button onclick="bankAdd(document.getElementById('bank-add'))">Add</button>
+        </div>
+        ${roster.length ? roster.map(n => `
+          <div class="bank-row">
+            <input class="bank-name" value="${esc(n)}" onchange="bankRename('${encodeURIComponent(n)}',this.value)"/>
+            <button class="pbtn del" title="Delete from bank" onclick="forgetEnc('${encodeURIComponent(n)}')">✕</button>
+          </div>`).join('') : `<div style="font-size:0.78rem;color:rgba(255,255,255,0.3);padding:6px 0">No saved players yet — add some above.</div>`}
+        <div class="bank-note">These names show as quick-add chips on each team. Editing a name here also renames any matching player in the current game.</div>
+      </div>`;
+  }
 
   /* ---------- helpers ---------- */
   function fmt(n) { n = Math.round(n * 10) / 10; return Number.isInteger(n) ? String(n) : n.toFixed(1); }
@@ -450,6 +523,8 @@
         </div>
       </div>`;
     }).join('');
+
+    renderBank();
   }
 
   /* ---------- boot ---------- */
