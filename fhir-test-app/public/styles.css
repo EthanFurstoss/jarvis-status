@@ -1,0 +1,136 @@
+:root {
+  --pcc-blue: #0a3d62;
+  --pcc-accent: #1e88e5;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --border: #e1e6ec;
+  --text: #1f2d3d;
+  --muted: #7b8794;
+  --green: #2e7d32;
+  --amber: #b26a00;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--pcc-blue);
+  color: #fff;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+.logo {
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.15);
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+}
+.topbar h1 { font-size: 18px; margin: 0; }
+.subtitle { margin: 2px 0 0; font-size: 12px; opacity: 0.8; }
+
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+}
+.badge-mock { background: #fff3cd; color: var(--amber); }
+.badge-live { background: #d7f5dd; color: var(--green); }
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  padding: 20px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sidebar h2, .detail h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+.patient-list { list-style: none; margin: 0; padding: 0; }
+.patient-list li { margin-bottom: 8px; }
+.patient-list button {
+  width: 100%;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.patient-list button:hover { border-color: var(--pcc-accent); }
+.patient-list button.active { border-color: var(--pcc-accent); box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.15); }
+.patient-list .pname { font-weight: 600; }
+.patient-list .pmeta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.detail { min-height: 300px; }
+.empty-state {
+  display: flex; align-items: center; justify-content: center;
+  height: 240px; color: var(--muted);
+  background: var(--card); border: 1px dashed var(--border); border-radius: 12px;
+}
+
+.patient-header {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+.patient-header h3 { margin: 0 0 6px; font-size: 22px; }
+.patient-header .demographics { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: var(--muted); }
+.patient-header .demographics b { color: var(--text); font-weight: 600; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.card h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.count-pill {
+  font-size: 11px; font-weight: 700;
+  background: var(--bg); color: var(--muted);
+  padding: 2px 8px; border-radius: 999px;
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+tr:last-child td { border-bottom: none; }
+.tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; background: #eef2f7; color: var(--muted); }
+.tag-active { background: #d7f5dd; color: var(--green); }
+.tag-high { background: #fde2e2; color: #c0392b; }
+.tag-low { background: #fff3cd; color: var(--amber); }
+.muted { color: var(--muted); }
+.none { color: var(--muted); font-size: 13px; font-style: italic; }
+
+.footer { text-align: center; padding: 16px; font-size: 12px; color: var(--muted); }
+
+.error {
+  background: #fde2e2; color: #c0392b;
+  border: 1px solid #f5b7b1; border-radius: 10px;
+  padding: 14px 16px; font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}

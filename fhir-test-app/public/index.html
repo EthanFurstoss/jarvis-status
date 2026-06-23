@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PointClickCare FHIR — Test App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">✚</span>
+      <div>
+        <h1>PointClickCare FHIR</h1>
+        <p class="subtitle">Test app · FHIR R4 sandbox client</p>
+      </div>
+    </div>
+    <span id="mode-badge" class="badge badge-mock" title="Data source">…</span>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h2>Patients</h2>
+      <ul id="patient-list" class="patient-list">
+        <li class="muted">Loading…</li>
+      </ul>
+    </aside>
+
+    <section id="detail" class="detail">
+      <div class="empty-state">
+        <p>Select a patient to view their FHIR records.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="footer-note"></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
