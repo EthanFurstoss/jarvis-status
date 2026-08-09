@@ -65,19 +65,20 @@
       min-width: 0;
     }
 
-    /* Hero: the team photo fills the top of the card (cover) and sits BEHIND the
-       team name + score, with a gradient scrim keeping the score readable. */
-    .hero { position: relative; overflow: hidden; background: #05050c; }
+    /* The team photo fills the WHOLE card — behind the score AND the player list. */
     .photo-bg {
-      position: absolute; inset: 0; background-size: cover; background-position: center 22%;
+      position: absolute; inset: 0; background-size: cover; background-position: center 18%;
       transition: opacity 0.5s; z-index: 0;
     }
-    .hero-scrim {
+    .card-scrim {
       position: absolute; inset: 0; z-index: 1; pointer-events: none;
-      background: linear-gradient(to bottom, rgba(7,7,18,0.12) 0%, rgba(7,7,18,0.02) 32%, rgba(7,7,18,0.5) 66%, rgba(7,7,18,0.9) 100%);
+      background: linear-gradient(to bottom,
+        rgba(7,7,18,0.18) 0%, rgba(7,7,18,0.0) 20%,
+        rgba(7,7,18,0.25) 46%, rgba(7,7,18,0.4) 66%, rgba(7,7,18,0.58) 100%);
     }
-    .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 300px; }
-    .hero-fill { flex: 1 1 auto; min-height: 90px; }
+    .card-content { position: relative; z-index: 2; display: flex; flex-direction: column; }
+    .hero-content { display: flex; flex-direction: column; min-height: 280px; }
+    .hero-fill { flex: 1 1 auto; min-height: 80px; }
     .team-accent { position: absolute; top: 0; left: 0; right: 0; height: 5px; z-index: 3; }
     .photo-dots { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; gap: 5px; }
     .photo-dots span { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.5); transition: all 0.3s; box-shadow: 0 0 4px rgba(0,0,0,0.6); }
@@ -107,25 +108,28 @@
     .score-btn {
       width: 46px; height: 38px; border-radius: 10px; cursor: pointer;
       font-size: 1.3rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
-      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #f0f0f2;
+      border: 1px solid rgba(255,255,255,0.18); background: rgba(10,12,26,0.5); color: #f0f0f2;
       transition: transform 0.08s; user-select: none; -webkit-tap-highlight-color: transparent;
     }
-    .score-btn.plus { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.3); color: #34d399; font-size: 1.5rem; height: 56px; }
+    .score-btn.plus { background: rgba(52,211,153,0.22); border-color: rgba(52,211,153,0.4); color: #34d399; font-size: 1.5rem; height: 56px; }
     .score-btn.plus:active { transform: scale(0.92); }
     .score-btn.minus:active { transform: scale(0.92); }
 
     /* Players */
-    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 13px 16px 16px; min-width: 0; }
+    .players {
+      border-top: 1px solid rgba(255,255,255,0.12); padding: 13px 16px 16px; min-width: 0;
+      background: rgba(7,7,18,0.44); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    }
     .players-title {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
-      color: rgba(255,255,255,0.22); margin-bottom: 9px;
+      color: rgba(255,255,255,0.35); margin-bottom: 9px; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     }
     .player-row {
       display: flex; align-items: center; gap: 6px; padding: 7px 0;
       border-bottom: 1px solid rgba(255,255,255,0.04); min-width: 0;
     }
     .player-row:last-child { border-bottom: none; }
-    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.85); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); }
+    .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.9); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); text-shadow: 0 1px 4px rgba(0,0,0,0.85); }
     .player-pts {
       font-family: var(--mono); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums;
       min-width: 38px; text-align: right;
@@ -133,7 +137,7 @@
     .pbtn {
       width: 26px; height: 28px; border-radius: 7px; cursor: pointer; flex-shrink: 0;
       font-size: 0.78rem; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center;
-      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.16); background: rgba(10,12,26,0.5); color: rgba(255,255,255,0.82);
       transition: transform 0.08s; user-select: none; -webkit-tap-highlight-color: transparent;
     }
     .pbtn:active { transform: scale(0.9); }
@@ -496,12 +500,12 @@
 
       return `
       <div class="team-card glass ${isLeader ? 'leader' : ''}" style="border-color:${color}55">
-        <div class="hero">
-          <div class="photo-bg" id="photo-bg-${t.key}" style="background-image:url('${curPhoto}')"></div>
-          <div class="hero-scrim"></div>
-          <div class="team-accent" style="background:${glow}"></div>
-          <div class="team-tag" style="background:${color}dd;color:${t.key==='white'?'#111':'#fff'}">${cfg.tag}</div>
-          ${dots}
+        <div class="photo-bg" id="photo-bg-${t.key}" style="background-image:url('${curPhoto}')"></div>
+        <div class="card-scrim"></div>
+        <div class="team-accent" style="background:${glow}"></div>
+        <div class="team-tag" style="background:${color}dd;color:${t.key==='white'?'#111':'#fff'}">${cfg.tag}</div>
+        ${dots}
+        <div class="card-content">
           <div class="hero-content">
             <div class="hero-fill"></div>
             <div class="team-name-overlay">
@@ -517,7 +521,6 @@
               </div>
             </div>
           </div>
-        </div>
         <div class="players">
           <div class="players-title">Players</div>
           ${playerRows}
@@ -531,6 +534,7 @@
           <div class="player-sum ${mismatch ? 'mismatch' : ''}">
             Player points: ${fmt(pTotal)} / Team ${fmt(t.score || 0)}${mismatch ? ' ⚠' : ''}
           </div>
+        </div>
         </div>
       </div>`;
     }).join('');
