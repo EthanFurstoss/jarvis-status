@@ -62,6 +62,7 @@
     .team-card {
       border-radius: 16px; padding: 0; overflow: hidden;
       display: flex; flex-direction: column; position: relative; border-width: 2px;
+      min-width: 0;
     }
 
     /* Photo banner — full image visible (contain) over a blurred fill of the same image */
@@ -117,14 +118,14 @@
     .score-btn.minus:active { transform: scale(0.92); }
 
     /* Players */
-    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 13px 16px 16px; }
+    .players { border-top: 1px solid rgba(255,255,255,0.06); padding: 13px 16px 16px; min-width: 0; }
     .players-title {
       font-size: 0.6rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
       color: rgba(255,255,255,0.22); margin-bottom: 9px;
     }
     .player-row {
       display: flex; align-items: center; gap: 6px; padding: 7px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04); min-width: 0;
     }
     .player-row:last-child { border-bottom: none; }
     .player-name { flex: 1; font-size: 0.82rem; color: rgba(255,255,255,0.85); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font); }
@@ -205,13 +206,25 @@
     @keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.16)} 100%{transform:scale(1)} }
     .pop { animation: pop 0.3s ease; }
 
-    /* Landscape on a phone: keep two columns, shrink the photo & score so a card fits the short height */
+    /* Landscape on a phone: two columns that can actually shrink (minmax 0),
+       plus a smaller photo/score/buttons so a full card fits without clipping. */
     @media (orientation: landscape) and (max-height: 600px) {
-      body { padding: 10px 12px 30px; }
-      .teams { grid-template-columns: 1fr 1fr; }
-      .team-photo { height: 150px; }
-      .score-num { font-size: 2.4rem; }
-      header { margin-bottom: 8px; }
+      body { padding: 8px 10px 28px; }
+      .teams { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+      .team-photo { height: 120px; }
+      .team-name-overlay { bottom: 8px; }
+      .team-name { font-size: 0.98rem; }
+      .score-block { padding: 10px 10px 12px; gap: 10px; }
+      .score-num { font-size: 2.1rem; letter-spacing: -1px; }
+      .score-btn { width: 40px; height: 34px; font-size: 1.15rem; }
+      .score-btn.plus { height: 46px; font-size: 1.35rem; }
+      .players { padding: 10px 12px 12px; }
+      .player-row { gap: 4px; padding: 6px 0; }
+      .pbtn { width: 24px; height: 26px; }
+      .pbtn.p-half { width: 26px; }
+      .player-pts { min-width: 30px; }
+      header { margin-bottom: 8px; padding: 8px 14px; }
+      .toolbar { margin-bottom: 10px; }
     }
   </style>
 </head>
